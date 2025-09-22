@@ -19,6 +19,9 @@ class DatabaseSeeder extends Seeder
         CouleurSeeder::class,
         CategorieSeeder::class,
         ProduitSeeder::class,
+        CategorieBlogSeeder::class,
+        TagSeeder::class,
+        BlogSeeder::class,
     ]);
     }
     
