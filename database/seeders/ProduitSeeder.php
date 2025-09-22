@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Produit;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -12,6 +13,232 @@ class ProduitSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        Produit::insert([
+            [
+                'titre' => 'Canapé Bleu Moderne',
+                'description' => 'Un canapé bleu élégant et moderne, alliant confort et style contemporain. Parfait pour créer un salon accueillant et raffiné, où se détendre ou recevoir des invités avec élégance.',
+                'image_path' => 'produits/banner_img.png',
+                'image2_path' => 'produits/banner_img.png',
+                'image3_path' => 'produits/banner_img.png',
+                'prix' => 45000,
+                'en_reduction' => true,
+                'reduction_pct' => 10,
+                'stock' => 12,
+                'couleur_id' => 9, // Bleu
+                'categorie_id' => 6, // Canapés
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'titre' => 'Chaise Verte Scandinave',
+                'description' => 'Chaise au design scandinave vert pastel, légère et pratique. Son assise confortable et sa silhouette épurée apportent fraîcheur et modernité à votre salle à manger ou bureau.',
+                'image_path' => 'produits/product_1.png',
+                'image2_path' => 'produits/product_1.png',
+                'image3_path' => 'produits/product_1.png',
+                'prix' => 12000,
+                'en_reduction' => false,
+                'reduction_pct' => null,
+                'stock' => 8,
+                'couleur_id' => 8, // Vert
+                'categorie_id' => 1, // Chaises
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'titre' => 'Chaise Orange Design',
+                'description' => 'Chaise orange au style contemporain, avec un design épuré et un confort optimal. Idéale pour apporter une touche dynamique à votre intérieur.',
+                'image_path' => 'produits/product_2.png',
+                'image2_path' => 'produits/product_2.png',
+                'image3_path' => 'produits/product_2.png',
+                'prix' => 13000,
+                'en_reduction' => true,
+                'reduction_pct' => 5,
+                'stock' => 5,
+                'couleur_id' => 11, // Orange
+                'categorie_id' => 1, // Chaises
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'titre' => 'Fauteuil Rotin Cosy',
+                'description' => 'Fauteuil en rotin naturel au style chaleureux et cosy. Parfait pour un coin lecture ou un salon détendu, combinant robustesse et confort.',
+                'image_path' => 'produits/product_4.png',
+                'image2_path' => 'produits/product_4.png',
+                'image3_path' => 'produits/product_4.png',
+                'prix' => 22000,
+                'en_reduction' => false,
+                'reduction_pct' => null,
+                'stock' => 4,
+                'couleur_id' => 6, // Marron
+                'categorie_id' => 7, // Fauteuils
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'titre' => 'Canapé Jaune Lumineux',
+                'description' => 'Canapé jaune vif et lumineux, conçu pour illuminer votre salon. Son assise douce et confortable en fait un espace parfait pour des moments conviviaux.',
+                'image_path' => 'produits/product_9.png',
+                'image2_path' => 'produits/product_9.png',
+                'image3_path' => 'produits/product_9.png',
+                'prix' => 48000,
+                'en_reduction' => true,
+                'reduction_pct' => 12,
+                'stock' => 10,
+                'couleur_id' => 7, // Jaune
+                'categorie_id' => 6, // Canapés
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'titre' => 'Chaise Bleu Scandinave',
+                'description' => 'Chaise bleu pastel au style scandinave, combinant légèreté et design moderne. Idéale pour un bureau ou une salle à manger créative.',
+                'image_path' => 'produits/feature_1.png',
+                'image2_path' => 'produits/feature_1.png',
+                'image3_path' => 'produits/feature_1.png',
+                'prix' => 14000,
+                'en_reduction' => false,
+                'reduction_pct' => null,
+                'stock' => 3,
+                'couleur_id' => 9, // Vert
+                'categorie_id' => 1, // Chaises
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'titre' => 'Chaise Orange Moderne',
+                'description' => 'Chaise orange au design moderne et lignes épurées, apportant une touche de couleur et de style à votre intérieur. Confort et esthétisme réunis.',
+                'image_path' => 'produits/feature_2.png',
+                'image2_path' => 'produits/feature_2.png',
+                'image3_path' => 'produits/feature_2.png',
+                'prix' => 12700,
+                'en_reduction' => true,
+                'reduction_pct' => 10,
+                'stock' => 20,
+                'couleur_id' => 11, // Orange
+                'categorie_id' => 1, // Chaises
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'titre' => 'Fauteuil rond mignon',
+                'description' => 'Petit fauteuil rond avec coussin central blanc, alliant confort et charme. Parfait pour un coin lecture ou une chambre cosy.',
+                'image_path' => 'produits/feature_3.png',
+                'image2_path' => 'produits/feature_3.png',
+                'image3_path' => 'produits/feature_3.png',
+                'prix' => 22500,
+                'en_reduction' => false,
+                'reduction_pct' => null,
+                'stock' => 4,
+                'couleur_id' => 6, // Marron
+                'categorie_id' => 7, // Fauteuils
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'titre' => 'Fauteuil rond bleu claire',
+                'description' => 'Fauteuil rond bleu clair aux couleurs pastel, idéal pour une chambre d’enfant ou un coin détente. Confort douillet et design apaisant.',
+                'image_path' => 'produits/offer_img.png',
+                'image2_path' => 'produits/offer_img.png',
+                'image3_path' => 'produits/offer_img.png',
+                'prix' => 29500,
+                'en_reduction' => false,
+                'reduction_pct' => null,
+                'stock' => 7,
+                'couleur_id' => 9, // Marron
+                'categorie_id' => 7, // Fauteuils
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'titre' => 'Chaise jaune design',
+                'description' => 'Chaise jaune contemporaine au style original et formes harmonieuses. Apporte lumière et modernité à votre espace repas ou bureau.',
+                'image_path' => 'produits/product_3.png',
+                'image2_path' => 'produits/product_3.png',
+                'image3_path' => 'produits/product_3.png',
+                'prix' => 92700,
+                'en_reduction' => true,
+                'reduction_pct' => 50,
+                'stock' => 6,
+                'couleur_id' => 7, // Orange
+                'categorie_id' => 1, // Chaises
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'titre' => 'Chaise à carraux',
+                'description' => 'Chaise à carreaux simple et pratique, avec un confort adapté pour la cuisine ou le bureau. Un classique revisité avec style.',
+                'image_path' => 'produits/product_4.png',
+                'image2_path' => 'produits/product_4.png',
+                'image3_path' => 'produits/product_4.png',
+                'prix' => 2700,
+                'en_reduction' => false,
+                'reduction_pct' => null,
+                'stock' => 30,
+                'couleur_id' => 13, // Autre
+                'categorie_id' => 1, // Chaises
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'titre' => 'Chaise blanche',
+                'description' => 'Chaise blanche avec accoudoirs, très confortable et élégante. Un meuble polyvalent pour la salle à manger ou un bureau moderne.',
+                'image_path' => 'produits/product_5.png',
+                'image2_path' => 'produits/product_5.png',
+                'image3_path' => 'produits/product_5.png',
+                'prix' => 2700,
+                'en_reduction' => false,
+                'reduction_pct' => null,
+                'stock' => 5,
+                'couleur_id' => 1, 
+                'categorie_id' => 1, // Chaises
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'titre' => 'Chaise vert nature',
+                'description' => 'Chaise vert olive au design naturel, parfaite pour une cuisine ou un espace repas lumineux. Confort et esthétisme sont réunis.',
+                'image_path' => 'produits/product_6.png',
+                'image2_path' => 'produits/product_6.png',
+                'image3_path' => 'produits/product_6.png',
+                'prix' => 30100,
+                'en_reduction' => false,
+                'reduction_pct' => null,
+                'stock' => 7,
+                'couleur_id' => 8, 
+                'categorie_id' => 1, // Chaises
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'titre' => 'Chaise blanche',
+                'description' => 'Chaise blanche au style minimaliste, confortable et pratique. Un choix simple mais élégant pour tout type d’intérieur.',
+                'image_path' => 'produits/product_7.png',
+                'image2_path' => 'produits/product_7.png',
+                'image3_path' => 'produits/product_7.png',
+                'prix' => 21700,
+                'en_reduction' => false,
+                'reduction_pct' => null,
+                'stock' => 4,
+                'couleur_id' => 1, 
+                'categorie_id' => 1, // Chaises
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'titre' => 'Chaise rouge',
+                'description' => 'Chaise rouge au design contemporain, parfaite pour apporter une touche de couleur vive à votre salon ou salle à manger. Confort et style garantis.',
+                'image_path' => 'produits/product_8.png',
+                'image2_path' => 'produits/product_8.png',
+                'image3_path' => 'produits/product_8.png',
+                'prix' => 21700,
+                'en_reduction' => false,
+                'reduction_pct' => null,
+                'stock' => 13,
+                'couleur_id' => 6, 
+                'categorie_id' => 1, // Chaises
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
     }
 }
