@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('titre');
             $table->text('description');
-            $table->string('image_path');
-            $table->string('image2_path');
-            $table->string('image3_path');
+            $table->longText('image_path');
+            $table->longText('image2_path');
+            $table->longText('image3_path');
             $table->integer('prix');
             $table->boolean('en_reduction')->default(false);
             $table->unsignedTinyInteger('reduction_pct')->nullable();
