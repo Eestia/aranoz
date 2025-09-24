@@ -15,4 +15,9 @@ class Blog extends Model
     {
         return $this->belongsTo(Categorie::class,'categorie_id');
     }
+    //un blog a plusieur commentaires:
+    public function commentaires()
+    {
+        return $this->hasMany(Commentaire::class);
+    }
 }

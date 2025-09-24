@@ -10,11 +10,6 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
-
         $this->call([
         CouleurSeeder::class,
         CategorieSeeder::class,
@@ -22,7 +17,14 @@ class DatabaseSeeder extends Seeder
         CategorieBlogSeeder::class,
         TagSeeder::class,
         BlogSeeder::class,
+        RoleSeeder::class,
+        UserSeeder::class,
     ]);
+        // User::factory()->create([
+        //     'name' => 'Test User',
+        //     'email' => 'test@example.com',
+        // ]);
+
     }
     
 }

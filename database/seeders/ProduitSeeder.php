@@ -14,6 +14,7 @@ class ProduitSeeder extends Seeder
     public function run(): void
     {
         Produit::insert([
+            //1
             [
                 'titre' => 'Canapé Bleu Moderne',
                 'description' => 'Un canapé bleu élégant et moderne, alliant confort et style contemporain. Parfait pour créer un salon accueillant et raffiné, où se détendre ou recevoir des invités avec élégance.',
@@ -29,6 +30,7 @@ class ProduitSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            //2
             [
                 'titre' => 'Chaise Verte Scandinave',
                 'description' => 'Chaise au design scandinave vert pastel, légère et pratique. Son assise confortable et sa silhouette épurée apportent fraîcheur et modernité à votre salle à manger ou bureau.',
@@ -44,6 +46,7 @@ class ProduitSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            //3
             [
                 'titre' => 'Chaise Orange Design',
                 'description' => 'Chaise orange au style contemporain, avec un design épuré et un confort optimal. Idéale pour apporter une touche dynamique à votre intérieur.',
@@ -59,6 +62,7 @@ class ProduitSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            //4
             [
                 'titre' => 'Fauteuil Rotin Cosy',
                 'description' => 'Fauteuil en rotin naturel au style chaleureux et cosy. Parfait pour un coin lecture ou un salon détendu, combinant robustesse et confort.',
@@ -74,6 +78,7 @@ class ProduitSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            //5
             [
                 'titre' => 'Canapé Jaune Lumineux',
                 'description' => 'Canapé jaune vif et lumineux, conçu pour illuminer votre salon. Son assise douce et confortable en fait un espace parfait pour des moments conviviaux.',
@@ -89,6 +94,7 @@ class ProduitSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            //6
             [
                 'titre' => 'Chaise Bleu Scandinave',
                 'description' => 'Chaise bleu pastel au style scandinave, combinant légèreté et design moderne. Idéale pour un bureau ou une salle à manger créative.',
@@ -104,6 +110,7 @@ class ProduitSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            //7
             [
                 'titre' => 'Chaise Orange Moderne',
                 'description' => 'Chaise orange au design moderne et lignes épurées, apportant une touche de couleur et de style à votre intérieur. Confort et esthétisme réunis.',
@@ -119,6 +126,7 @@ class ProduitSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            //8
             [
                 'titre' => 'Fauteuil rond mignon',
                 'description' => 'Petit fauteuil rond avec coussin central blanc, alliant confort et charme. Parfait pour un coin lecture ou une chambre cosy.',
@@ -134,6 +142,7 @@ class ProduitSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            //9
             [
                 'titre' => 'Fauteuil rond bleu claire',
                 'description' => 'Fauteuil rond bleu clair aux couleurs pastel, idéal pour une chambre d’enfant ou un coin détente. Confort douillet et design apaisant.',
@@ -149,6 +158,7 @@ class ProduitSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            //10
             [
                 'titre' => 'Chaise jaune design',
                 'description' => 'Chaise jaune contemporaine au style original et formes harmonieuses. Apporte lumière et modernité à votre espace repas ou bureau.',
@@ -164,6 +174,7 @@ class ProduitSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            //11
             [
                 'titre' => 'Chaise à carraux',
                 'description' => 'Chaise à carreaux simple et pratique, avec un confort adapté pour la cuisine ou le bureau. Un classique revisité avec style.',
@@ -179,6 +190,7 @@ class ProduitSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            //12
             [
                 'titre' => 'Chaise blanche',
                 'description' => 'Chaise blanche avec accoudoirs, très confortable et élégante. Un meuble polyvalent pour la salle à manger ou un bureau moderne.',
@@ -194,6 +206,7 @@ class ProduitSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            //13
             [
                 'titre' => 'Chaise vert nature',
                 'description' => 'Chaise vert olive au design naturel, parfaite pour une cuisine ou un espace repas lumineux. Confort et esthétisme sont réunis.',
@@ -209,6 +222,7 @@ class ProduitSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            //14
             [
                 'titre' => 'Chaise blanche',
                 'description' => 'Chaise blanche au style minimaliste, confortable et pratique. Un choix simple mais élégant pour tout type d’intérieur.',
@@ -224,6 +238,7 @@ class ProduitSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            //15
             [
                 'titre' => 'Chaise rouge',
                 'description' => 'Chaise rouge au design contemporain, parfaite pour apporter une touche de couleur vive à votre salon ou salle à manger. Confort et style garantis.',
