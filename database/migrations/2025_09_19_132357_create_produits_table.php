@@ -20,6 +20,7 @@ return new class extends Migration
             $table->longText('image3_path');
             $table->integer('prix');
             $table->boolean('en_reduction')->default(false);
+            $table->boolean('is_pinned')->default(false);
             $table->unsignedTinyInteger('reduction_pct')->nullable();
             $table->integer('stock');
             $table->foreignId('couleur_id')->constrained()->cascadeOnDelete();

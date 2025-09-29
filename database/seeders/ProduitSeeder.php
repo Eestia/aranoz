@@ -23,6 +23,7 @@ class ProduitSeeder extends Seeder
                 'image3_path' => 'produits/banner_img.png',
                 'prix' => 45000,
                 'en_reduction' => true,
+                'is_pinned' => false,
                 'reduction_pct' => 10,
                 'stock' => 12,
                 'couleur_id' => 9, // Bleu
@@ -39,6 +40,7 @@ class ProduitSeeder extends Seeder
                 'image3_path' => 'produits/product_1.png',
                 'prix' => 12000,
                 'en_reduction' => false,
+                'is_pinned' => false,
                 'reduction_pct' => null,
                 'stock' => 8,
                 'couleur_id' => 8, // Vert
@@ -55,6 +57,7 @@ class ProduitSeeder extends Seeder
                 'image3_path' => 'produits/product_2.png',
                 'prix' => 13000,
                 'en_reduction' => true,
+                'is_pinned' => false,
                 'reduction_pct' => 5,
                 'stock' => 5,
                 'couleur_id' => 11, // Orange
@@ -71,6 +74,7 @@ class ProduitSeeder extends Seeder
                 'image3_path' => 'produits/product_4.png',
                 'prix' => 22000,
                 'en_reduction' => false,
+                'is_pinned' => false,
                 'reduction_pct' => null,
                 'stock' => 4,
                 'couleur_id' => 6, // Marron
@@ -87,6 +91,7 @@ class ProduitSeeder extends Seeder
                 'image3_path' => 'produits/product_9.png',
                 'prix' => 48000,
                 'en_reduction' => true,
+                'is_pinned' => true,
                 'reduction_pct' => 12,
                 'stock' => 10,
                 'couleur_id' => 7, // Jaune
@@ -103,6 +108,7 @@ class ProduitSeeder extends Seeder
                 'image3_path' => 'produits/feature_1.png',
                 'prix' => 14000,
                 'en_reduction' => false,
+                'is_pinned' => false,
                 'reduction_pct' => null,
                 'stock' => 3,
                 'couleur_id' => 9, // Vert
@@ -119,6 +125,7 @@ class ProduitSeeder extends Seeder
                 'image3_path' => 'produits/feature_2.png',
                 'prix' => 12700,
                 'en_reduction' => true,
+                'is_pinned' => true,
                 'reduction_pct' => 10,
                 'stock' => 20,
                 'couleur_id' => 11, // Orange
@@ -135,6 +142,7 @@ class ProduitSeeder extends Seeder
                 'image3_path' => 'produits/feature_3.png',
                 'prix' => 22500,
                 'en_reduction' => false,
+                'is_pinned' => false,
                 'reduction_pct' => null,
                 'stock' => 4,
                 'couleur_id' => 6, // Marron
@@ -151,6 +159,7 @@ class ProduitSeeder extends Seeder
                 'image3_path' => 'produits/offer_img.png',
                 'prix' => 29500,
                 'en_reduction' => false,
+                'is_pinned' => false,
                 'reduction_pct' => null,
                 'stock' => 7,
                 'couleur_id' => 9, // Marron
@@ -167,6 +176,7 @@ class ProduitSeeder extends Seeder
                 'image3_path' => 'produits/product_3.png',
                 'prix' => 92700,
                 'en_reduction' => true,
+                'is_pinned' => false,
                 'reduction_pct' => 50,
                 'stock' => 6,
                 'couleur_id' => 7, // Orange
@@ -183,6 +193,7 @@ class ProduitSeeder extends Seeder
                 'image3_path' => 'produits/product_4.png',
                 'prix' => 2700,
                 'en_reduction' => false,
+                'is_pinned' => false,
                 'reduction_pct' => null,
                 'stock' => 30,
                 'couleur_id' => 13, // Autre
@@ -199,6 +210,7 @@ class ProduitSeeder extends Seeder
                 'image3_path' => 'produits/product_5.png',
                 'prix' => 2700,
                 'en_reduction' => false,
+                'is_pinned' => true,
                 'reduction_pct' => null,
                 'stock' => 5,
                 'couleur_id' => 1, 
@@ -215,6 +227,7 @@ class ProduitSeeder extends Seeder
                 'image3_path' => 'produits/product_6.png',
                 'prix' => 30100,
                 'en_reduction' => false,
+                'is_pinned' => false,
                 'reduction_pct' => null,
                 'stock' => 7,
                 'couleur_id' => 8, 
@@ -231,6 +244,7 @@ class ProduitSeeder extends Seeder
                 'image3_path' => 'produits/product_7.png',
                 'prix' => 21700,
                 'en_reduction' => false,
+                'is_pinned' => false,
                 'reduction_pct' => null,
                 'stock' => 4,
                 'couleur_id' => 1, 
@@ -247,6 +261,7 @@ class ProduitSeeder extends Seeder
                 'image3_path' => 'produits/product_8.png',
                 'prix' => 21700,
                 'en_reduction' => false,
+                'is_pinned' => true,
                 'reduction_pct' => null,
                 'stock' => 13,
                 'couleur_id' => 6, 

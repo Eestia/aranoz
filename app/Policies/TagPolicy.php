@@ -8,12 +8,11 @@ use Illuminate\Auth\Access\Response;
 
 class TagPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
+
     public function viewAny(User $user): bool
     {
-        return false;
+        // ----------Tout utilisateur connecté peut voir la liste
+        return true;
     }
 
     /**
@@ -29,7 +28,8 @@ class TagPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        // ----------Admin ou Rédacteur peuvent créer
+        return in_array($user->role, ['admin', 'redacteur']);
     }
 
     /**
@@ -37,7 +37,8 @@ class TagPolicy
      */
     public function update(User $user, Tag $tag): bool
     {
-        return false;
+        // ----------Admin ou Rédacteur peuvent modifier
+        return in_array($user->role, ['admin', 'redacteur']);
     }
 
     /**
@@ -45,7 +46,8 @@ class TagPolicy
      */
     public function delete(User $user, Tag $tag): bool
     {
-        return false;
+        // ----------Admin ou Rédacteur peuvent supprimer
+        return in_array($user->role, ['admin', 'redacteur']);
     }
 
     /**

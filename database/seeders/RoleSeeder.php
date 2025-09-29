@@ -18,6 +18,7 @@ class RoleSeeder extends Seeder
             ['name' => 'user',      'created_at' => now(), 'updated_at' => now()],
             ['name' => 'redacteur', 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'webmaster', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'agent',     'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 }

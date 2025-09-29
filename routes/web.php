@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TagController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -28,6 +29,7 @@ Route::middleware('auth')->group(function () {
 
     //blog:
 Route::resource('blogs', BlogController::class);
-
+    //Tag
+Route::resource('tags', TagController::class);
 
 require __DIR__.'/auth.php';
