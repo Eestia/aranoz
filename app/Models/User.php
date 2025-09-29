@@ -51,6 +51,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(Commentaire::class);
     }
+    //-------- commandes:
+    public function commandes()
+    {
+        return $this->hasMany(Commande::class);
+    }
     // ( ˶°ㅁ°) !! user à un adresse
     public function adresse()
     {

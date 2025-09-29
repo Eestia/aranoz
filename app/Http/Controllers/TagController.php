@@ -13,7 +13,7 @@ class TagController extends Controller
 
     public function __construct()
     {
-        $this->authorizeResource(\App\Models\Tag::class, 'tag');
+        $this->authorizeResource(Tag::class, 'tag');
     }
     // Liste des tags
     public function index()

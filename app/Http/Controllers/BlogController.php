@@ -14,7 +14,7 @@ class BlogController extends Controller
     // Apelle automatiquement la bonne methode pour chaque role: 
     public function __construct()
     {
-        $this->authorizeResource(\App\Models\Blog::class, 'blog');
+        $this->authorizeResource(Blog::class, 'blog');
     }
     // Liste des blogs
     public function index()

@@ -10,6 +10,7 @@ class AuthServiceProvider extends ServiceProvider
     \App\Models\Blog::class => \App\Policies\BlogPolicy::class,
     \App\Models\Tag::class => \App\Policies\TagPolicy::class,
     \App\Models\Adresse::class => \App\Policies\AdressePolicy::class,
+    \App\Models\Produit::class => \App\Policies\ProduitPolicy::class,
     ];
     public function register(): void
     {

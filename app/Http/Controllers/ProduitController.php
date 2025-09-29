@@ -6,9 +6,16 @@ use App\Models\Couleur;
 use App\Models\Produit;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class ProduitController extends Controller
 {
+    use AuthorizesRequests;
+
+    public function __construct()
+    {
+        $this->authorizeResource(Produit::class, 'produit');
+    }
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -23,8 +30,12 @@ class ProduitController extends Controller
             'stock' => 'required|integer|min:0',
             'couleur_id' => 'required|exists:couleurs,id',
             'categorie_id' => 'required|exists:categories,id',
+            'is_pinned' => 'boolean',
         ]);
-        
+
+        // Si la checkbox n’est pas cochée, on force à false
+        $validated['is_pinned'] = $request->has('is_pinned');
+
         $path = $request->file('image')->store('produits','public');
 
         //création d'un produit
@@ -120,4 +131,18 @@ class ProduitController extends Controller
 
             return Inertia::location("/produits/index");
         }
+        public function pinned()
+        {
+            // Aucune restriction : tout le monde (même non connecté) peut voir les produits pin
+            $pinnedProducts = Produit::where('is_pinned', true)
+                                    ->latest()
+                                    ->take(4)
+                                    ->get();
+
+            // Envoie les données au front (Inertia)
+            return Inertia::render('Home/home', [
+                'produits' => $pinnedProducts
+            ]);
+        }
+
 }
