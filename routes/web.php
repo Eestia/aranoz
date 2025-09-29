@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\AdresseController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\ProduitController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TagController;
 use Illuminate\Foundation\Application;
@@ -31,5 +33,9 @@ Route::middleware('auth')->group(function () {
 Route::resource('blogs', BlogController::class);
     //Tag
 Route::resource('tags', TagController::class);
+    //Adresse
+Route::resource('adresses', AdresseController::class);
+    //Produit
+Route::resource('produits', ProduitController::class);
 
 require __DIR__.'/auth.php';

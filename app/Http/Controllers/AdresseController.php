@@ -3,10 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class AdresseController extends Controller
 
 {
+    use AuthorizesRequests;
+
+    public function __construct()
+    {
+        $this->authorizeResource(\App\Models\Adresse::class, 'adresse');
+    }
     public function store(Request $request)
     {
         $request->validate([
