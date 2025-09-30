@@ -76,10 +76,13 @@ class CommandeController extends Controller
     //----------- Optionnel : contacter le client par mail
     public function contactClient(Request $request, Commande $commande)
     {
-        $this->authorize('contact', $commande); // vérifie rôle via policy
+        $this->authorize('contact', $commande);
 
-        // Ici tu peux créer un Mailable ContactClient avec $request->message
-        Mail::to($commande->user->email)->send(new \App\Mail\ContactClient($request->message));
+        $request->validate([
+            'message' => 'required|string|max:1000',
+        ]);
+
+        Mail::to($commande->user->email)->send(new \App\Mail\ContactClient($request->message, $commande));
 
         return redirect()->back()->with('success', 'Mail envoyé au client.');
     }

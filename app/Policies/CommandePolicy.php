@@ -13,15 +13,15 @@ class CommandePolicy
      */
     public function viewAny(User $user)
     {
-        return $user->role === 'agent';
+        return in_array($user->role, ['admin', 'agent']);
     }
     public function updateStatus(User $user, Commande $commande)
     {
-        return $user->role === 'agent';
+        return in_array($user->role, ['admin', 'agent']);
     }
     public function contact(User $user, Commande $commande)
     {
-        return $user->role === 'agent';
+        return in_array($user->role, ['admin', 'agent']);
     }
     /**
      * Determine whether the user can view the model.
