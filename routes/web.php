@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdresseController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CommandeController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PanierController;
 use App\Http\Controllers\ProduitController;
 use App\Http\Controllers\ProfileController;
@@ -40,7 +41,9 @@ Route::resource('adresses', AdresseController::class);
     //Produit
 Route::resource('produits', ProduitController::class);
     //Produit Pin dans la page Home
-Route::get('/', [ProduitController::class, 'home'])->name('home');
+// Route::get('/', [ProduitController::class, 'home'])->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
 //------------------------------------------------------------------
 // Afficher le panier
 Route::get('/panier', [PanierController::class, 'index'])

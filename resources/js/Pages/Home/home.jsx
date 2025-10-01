@@ -1,22 +1,20 @@
-// //------ page Home exemple: 
 
-// import { usePage } from '@inertiajs/react';
+import Front from '@/Layouts/Front';
+import Carousel from '@/Components/Carousel';
+import { usePage } from '@inertiajs/react';
+import Category from '@/Components/Category';
 
-// export default function Home() {
-//     const { produits } = usePage().props;
+export default function Home() {
+    const { produits } = usePage().props;
 
-//     return (
-//         <div>
-//             <h2>Produits épinglés</h2>
-//             <div className="carousel">
-//                 {produits.map((produit) => (
-//                     <div key={produit.id} className="carousel-item">
-//                         <img src={`/storage/${produit.image_path}`} alt={produit.titre} />
-//                         <h3>{produit.titre}</h3>
-//                         <p>{produit.prix} €</p>
-//                     </div>
-//                 ))}
-//             </div>
-//         </div>
-//     );
-// }
+    return (
+        <Front>
+            <div>
+                <Carousel produits={produits} />
+            </div>
+            <div>
+                <Category produits={produits}/>
+            </div>
+        </Front>
+    );
+}

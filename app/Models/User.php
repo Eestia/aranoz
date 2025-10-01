@@ -61,4 +61,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Adresse::class);
     }
+    // favoris
+        public function favoris()
+    {
+        return $this->belongsToMany(Produit::class, 'favoris');
+    }
 }

@@ -39,4 +39,15 @@ class Produit extends Model
     {
         return asset('storage/' . $this->image3_path);
     }
+    //favoris
+    public function favoris()
+    {
+        return $this->belongsToMany(User::class, 'favoris');
+    }
+    public function favorisCount()
+    {
+        return $this->favoris()->count();
+    }
+
+
 }
