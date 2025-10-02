@@ -23,6 +23,8 @@
         "vite": "^7.0.4"
     },
     "dependencies": {
-        "bootstrap": "^5.3.8"
+        "bootstrap": "^5.3.8",
+        "react-slick": "^0.31.0",
+        "slick-carousel": "^1.8.1"
     }
 }

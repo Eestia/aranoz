@@ -9,11 +9,14 @@ use Inertia\Inertia;
 class HomeController extends Controller
 {
     public function index()
-    {
-        $pinnedProducts = Produit::where('is_pinned', true)->get();
+{
+    $pinnedProducts = Produit::where('is_pinned', true)->get();
+    $produits = Produit::all();
 
-        return Inertia::render('Home/home', [
-            'produits' => $pinnedProducts
-        ]);
-    }
+    return Inertia::render('Home/home', [
+        'pinned'   => $pinnedProducts,
+        'produits' => $produits,
+    ]);
+}
+
 }
