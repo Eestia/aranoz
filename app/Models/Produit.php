@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Produit extends Model
 {
     protected $fillable = [
-        'titre','description','image_path','image2_path','image3_path',
+        'titre','slug','description','image_path','image2_path','image3_path',
         'prix','en_reduction','is_pinned','reduction_pct','stock','couleur_id','categorie_id'
     ];
 
@@ -48,6 +48,10 @@ class Produit extends Model
     {
         return $this->favoris()->count();
     }
-
+    
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 
 }

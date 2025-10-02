@@ -8,8 +8,11 @@ use App\Http\Controllers\PanierController;
 use App\Http\Controllers\ProduitController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TagController;
+use App\Models\Categorie;
+use App\Models\Couleur;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use App\Models\Produit;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -32,8 +35,6 @@ Route::middleware('auth')->group(function () {
 });
 //------------------- mes routes ajoutées: 
 
-    //blog:
-Route::resource('blogs', BlogController::class);
     //Tag
 Route::resource('tags', TagController::class);
     //Adresse
@@ -78,4 +79,28 @@ Route::middleware(['auth', 'role:agent'])->group(function () {
     Route::post('/commandes/{commande}/contact', [CommandeController::class, 'contactClient'])
         ->name('commandes.contactClient');
 });
+    // bestseller
+    Route::get('/best-sellers', function () {
+        // Produits les plus vendus = ceux avec le moins de stock
+        $produits = Produit::orderBy('stock', 'asc')->take(12)->get();
+
+        return inertia('Home/home', [
+            'produits' => $produits
+        ]);
+    });
+    // shop route 
+Route::get('/shop', function () {
+    $produits = Produit::with(['categorie', 'couleur'])->get();
+    $categories = Categorie::pluck('nom');
+    $couleurs = Couleur::pluck('nom');
+
+    return inertia::render('Shop/Index', [
+        'produits' => $produits,
+        'categories' => $categories,
+        'couleurs' => $couleurs,
+    ]);
+});
+    // Blog
+    Route::resource('blogs', BlogController::class);
+ 
 require __DIR__.'/auth.php';

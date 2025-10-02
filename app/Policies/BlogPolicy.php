@@ -8,15 +8,14 @@ use Illuminate\Auth\Access\Response;
 
 class BlogPolicy
 {
-    public function viewAny(User $user)
+    public function viewAny(?User $user)
     {
-        //-------------tout utilisateur connecté peut voir la liste
         return true;
     }
-
-    public function view(User $user, Blog $blog): bool
+    
+    public function view(?User $user, Blog $blog): bool
     {
-        return false;
+        return true;
     }
 
     public function create(User $user)

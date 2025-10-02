@@ -3,7 +3,11 @@
   position: relative;
   cursor: pointer;
 }
-
+/* .container-fluid{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+} */
 .explore-link {
   position: absolute;
   top: 50%;
@@ -22,4 +26,8 @@
 }
 .card{
     cursor: pointer;
+}
+.utilisateur-icon{
+    width: 30px;
+    height: 30px;
 }

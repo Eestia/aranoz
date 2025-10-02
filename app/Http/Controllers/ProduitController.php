@@ -16,6 +16,12 @@ class ProduitController extends Controller
     {
         $this->authorizeResource(Produit::class, 'produit');
     }
+    public function show(Produit $produit)
+    {
+        $this->authorize('view', $produit); // <-- attention ici
+        return Inertia::render('produits/show', ['produit' => $produit]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -143,6 +149,12 @@ class ProduitController extends Controller
             return Inertia::render('Home/home', [
                 'produits' => $pinnedProducts
             ]);
+        }
+
+        public function bestSellers()
+        {
+            $produits = Produit::orderBy('stock', 'asc')->take(20)->get(); // ex: top 20
+            return response()->json($produits);
         }
 
 }

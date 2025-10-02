@@ -1,3 +1,4 @@
+import Footer from "@/Components/Footer";
 import Nav from "@/Components/Nav";
 
 
@@ -11,6 +12,7 @@ export default function Front ({children}) {
             <main>
                 {children}
             </main>
+            <Footer/>
         </>
     )
 }

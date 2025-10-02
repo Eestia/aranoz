@@ -1,4 +1,5 @@
 import "../../css/app.css";
+import { Link } from '@inertiajs/react';
 
 export default function FeaturedProducts() {
   return (
@@ -7,10 +8,10 @@ export default function FeaturedProducts() {
 
       <div className="row g-4">
         {[
-          { title: "Fauteuils", img: "/storage/produits/offer_img.png", alt: "Fauteuil rond bleu claire" },
-          { title: "Canapés", img: "/storage/produits/feature_4.png", alt: "Produit spécial" },
-          { title: "Fauteuils", img: "/storage/produits/feature_3.png", alt: "Fauteuil rond mignon" },
-          { title: "Chaises", img: "/storage/produits/product_2.png", alt: "Chaise Orange Design" },
+            { title: "Fauteuils", slug: "fauteuil3", img: "/storage/produits/offer_img.png", alt: "Fauteuil rond bleu claire" },
+            { title: "Canapés", slug: "fauteuil", img: "/storage/produits/feature_4.png", alt: "Produit spécial" },
+            { title: "Fauteuils", slug: "fauteuil2", img: "/storage/produits/feature_3.png", alt: "Fauteuil rond mignon" },
+            { title: "Chaises", slug: "chaise2", img: "/storage/produits/product_2.png", alt: "Chaise Orange Design" },
         ].map((item, idx) => (
           <div className="col-md-6" key={idx}>
             <div className="card-wrapper">
@@ -34,9 +35,9 @@ export default function FeaturedProducts() {
               </div>
 
               {/* Overlay Link */}
-              <a href="/votre-page" className="explore-link">
+              <Link href={`/produits/${item.slug}`} className="explore-link">
                 Explore Now!
-              </a>
+              </Link>
             </div>
           </div>
         ))}

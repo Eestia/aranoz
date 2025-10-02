@@ -14,19 +14,19 @@ class CouleurSeeder extends Seeder
     public function run(): void
     {
          $couleurs = [
-            'Blanc',
-            'Noyer',        // walnut
-            'Chêne',        // oak
-            'Noir',
-            'Marron',
-            'Rouge',
-            'Jaune',
-            'Vert',
-            'Bleu',
-            'Rose',
-            'Orange',
-            'Violet',
-            'Autre',
+            'Blanc',        //1
+            'Noyer',        // 2
+            'Chêne',        // 3
+            'Noir',         // 4
+            'Marron',       //5
+            'Rouge',        // 6
+            'Jaune',        //7
+            'Vert',         //8
+            'Bleu',         // 9
+            'Rose',         // 10
+            'Orange',       // 11
+            'Violet',       // 12
+            'Autre',        // 13
         ];
 
         foreach ($couleurs as $nom) {

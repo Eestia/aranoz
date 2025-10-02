@@ -14,14 +14,22 @@ class BlogController extends Controller
     // Apelle automatiquement la bonne methode pour chaque role: 
     public function __construct()
     {
-        $this->authorizeResource(Blog::class, 'blog');
+       $this->authorizeResource(Blog::class, 'blog', [
+        'except' => ['index', 'show']
+    ]);
     }
     // Liste des blogs
     public function index()
     {
-        $blogs = Blog::with('categorie')->get();
+        $blogs = Blog::with('categorie')->latest()->get();
+        $categories = Categorie::all();
+        $recentBlogs = Blog::latest()->take(4)->get();
+
         return Inertia::render('Blog/Index', [
-            'blogs' => $blogs
+            'blogs' => $blogs,
+            'categories' => $categories,
+            'recentBlogs' => $recentBlogs,
+            // 'tags' => Tag::all() // si tu veux les tags
         ]);
     }
 
