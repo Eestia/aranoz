@@ -30,11 +30,11 @@ export default function Nav() {
                 Blog
               </a>
               <ul className="dropdown-menu">
-                <li><a className="dropdown-item" href="#">Blog Table</a></li>
+                <li><a className="dropdown-item" href="/blogs">Blog Table</a></li>
               </ul>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#">Contact</a>
+              <a className="nav-link" href="/Contact">Contact</a>
             </li>
 
             {/* Icon user */}

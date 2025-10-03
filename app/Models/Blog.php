@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Blog extends Model
 {
+    protected $fillable = [
+        'titre','description','image_path','categorie_id'
+    ];
     public function tags()
     {
         return $this->belongsToMany(Tag::class);
@@ -13,7 +16,7 @@ class Blog extends Model
 
     public function categorie()
     {
-        return $this->belongsTo(Categorie::class,'categorie_id');
+        return $this->belongsTo(CategorieBlog::class,'categorie_id');
     }
     //un blog a plusieur commentaires:
     public function commentaires()

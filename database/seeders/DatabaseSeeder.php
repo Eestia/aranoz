@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
         BlogSeeder::class,
         RoleSeeder::class,
         UserSeeder::class,
+        AdresseSeeder::class,
     ]);
         // User::factory()->create([
         //     'name' => 'Test User',

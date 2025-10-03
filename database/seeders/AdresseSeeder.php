@@ -8,20 +8,19 @@ use Illuminate\Database\Seeder;
 
 class AdresseSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $user = User::find(1); 
+        $user = User::find(1); // Admin
 
-        $user->adresses()->create([
-            'rue'         => 'Rue Victor Hugo',
-            'numero'      => '12B',
-            'ville'       => 'Lyon',
-            'code_postal' => '69001',
-            'pays'        => 'France',
-            'code_pays'   => 'FR',
-        ]);
+        if ($user) {
+            $user->adresse()->create([
+                'rue'         => 'Place de la minoterie',
+                'numero'      => '10',
+                'ville'       => 'Molenbeek',
+                'code_postal' => '1080',
+                'pays'        => 'Belgique',
+                'code_pays'   => 'BE',
+            ]);
+        }
     }
 }

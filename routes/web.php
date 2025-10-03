@@ -102,5 +102,7 @@ Route::get('/shop', function () {
 });
     // Blog
     Route::resource('blogs', BlogController::class);
- 
+    // contact 
+    Route::get('/Contact', [AdresseController::class, 'contact'])->name('contact');
+
 require __DIR__.'/auth.php';

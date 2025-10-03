@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Blog;
 use App\Models\Categorie;
+use App\Models\CategorieBlog;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests; 
 use Inertia\Inertia;
@@ -19,19 +21,41 @@ class BlogController extends Controller
     ]);
     }
     // Liste des blogs
-    public function index()
+    public function index(Request $request)
     {
-        $blogs = Blog::with('categorie')->latest()->get();
-        $categories = Categorie::all();
-        $recentBlogs = Blog::latest()->take(4)->get();
+        $query = Blog::with(['categorie', 'tags'])->latest();
+
+        // Filtre par catégorie
+        if ($request->filled('category')) {
+            $query->whereHas('categorie', function ($q) use ($request) {
+                $q->where('nom', $request->category);
+            });
+        }
+
+        // Filtre par tag
+        if ($request->filled('tag')) {
+            $query->whereHas('tags', function ($q) use ($request) {
+                $q->where('nom', $request->tag);
+            });
+        }
+
+        // Filtre par recherche
+        if ($request->filled('search')) {
+            $query->where('titre', 'like', '%' . $request->search . '%');
+        }
+
+        $blogs = $query->with(['categorie', 'tags'])->get();
 
         return Inertia::render('Blog/Index', [
             'blogs' => $blogs,
-            'categories' => $categories,
-            'recentBlogs' => $recentBlogs,
-            // 'tags' => Tag::all() // si tu veux les tags
+            'categories' => CategorieBlog::all(),
+            'tags' => Tag::all(),
+            'recentBlogs' => Blog::latest()->take(4)->get(),
+            'filters' => $request->only(['category', 'tag', 'search']) // ✅ utile pour garder l’état côté React
         ]);
     }
+
+
 
     // Formulaire de création
     public function create()
@@ -77,7 +101,7 @@ class BlogController extends Controller
         $blog = Blog::findOrFail($id);
 
         $validated = $request->validate([
-            'categorie_id' => 'required|exists:categories,id',
+            'categorie_id' => 'required|exists:categorie_blogs,id',
             'titre' => 'required|string|max:255',
             'description' => 'required|string',
             'image' => 'nullable|image|max:2048',
@@ -109,4 +133,12 @@ class BlogController extends Controller
 
         return Inertia::location("/blogs/index");
     }
-}
+    public function show($id)
+    {
+        $blog = Blog::with(['categorie', 'tags'])->findOrFail($id);
+
+        return Inertia::render('Blog/show', [
+            'blog' => $blog
+        ]);
+    }
+}   

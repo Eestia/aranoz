@@ -19,9 +19,7 @@ return new class extends Migration
             $table->integer("code_postal");
             $table->text("pays");
             $table->text("code_pays");
-            $table->string("tel");
-            $table->string("email");
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
