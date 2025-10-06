@@ -1,6 +1,6 @@
 import Breadcrumb from "@/Components/Breadcrumb";
 import Front from "@/Layouts/Front";
-import { Home, Phone, Mail } from "lucide-react"; // 👈 icônes Lucide
+import { Home, Phone, Mail } from "lucide-react"; 
 
 export default function Contact({ admin }) {
   const adresse = admin?.adresse;

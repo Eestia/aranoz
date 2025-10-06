@@ -8,101 +8,121 @@ use App\Http\Controllers\PanierController;
 use App\Http\Controllers\ProduitController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TagController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\MailboxController;
+use App\Http\Controllers\CategorieController;
+use App\Http\Controllers\CategorieBlogController;
+
 use App\Models\Categorie;
+use App\Models\CategorieBlog;
 use App\Models\Couleur;
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Route;
 use App\Models\Produit;
+use App\Models\Tag;
+use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+// ------------------ PAGE D’ACCUEIL PUBLIQUE ------------------
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// ------------------ DASHBOARD (auth obligatoire) ------------------
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// ------------------ PROFIL UTILISATEUR ------------------
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-//------------------- mes routes ajoutées: 
 
-    //Tag
-Route::resource('tags', TagController::class);
-    //Adresse
+// ------------------ CRUD PUBLIC ------------------
 Route::resource('adresses', AdresseController::class);
-    //Produit
 Route::resource('produits', ProduitController::class);
-    //Produit Pin dans la page Home
-// Route::get('/', [ProduitController::class, 'home'])->name('home');
-Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::resource('blogs', BlogController::class);
 
-//------------------------------------------------------------------
-// Afficher le panier
+// ------------------ PANIER + COMMANDES ------------------
 Route::get('/panier', [PanierController::class, 'index'])
      ->name('panier.index')
      ->middleware('auth');
 
-// Ajouter un produit au panier
 Route::post('/panier/{produit}', [PanierController::class, 'add'])->middleware('auth');
-
-// Valider la commande
 Route::post('/commande', [CommandeController::class, 'store'])->middleware('auth');
 
-// Afficher les commandes (admin / agent)
+// ------------------ COMMANDES (Admin + Agent) ------------------
 Route::get('/commandes', [CommandeController::class, 'index'])
-     ->middleware(['auth', 'role:admin,agent']);
+     ->middleware(['auth', 'role:admin,agent'])
+     ->name('commandes.index');
 
-// Changer le statut d’une commande
 Route::patch('/commandes/{commande}/status', [CommandeController::class, 'updateStatus'])
-     ->middleware(['auth', 'role:admin,agent']);
+     ->middleware(['auth', 'role:admin,agent'])
+     ->name('commandes.updateStatus');
 
-//-----------route pour autorisation de l'agent:
-Route::middleware(['auth', 'role:agent'])->group(function () {
-    // Voir toutes les commandes
-    Route::get('/commandes', [CommandeController::class, 'index'])
-        ->name('commandes.index');
+Route::post('/commandes/{commande}/contact', [CommandeController::class, 'contactClient'])
+     ->middleware(['auth', 'role:agent'])
+     ->name('commandes.contactClient');
 
-    // Mettre à jour le statut d’une commande
-    Route::patch('/commandes/{commande}/status', [CommandeController::class, 'updateStatus'])
-        ->name('commandes.updateStatus');
+// ------------------ BEST SELLERS ------------------
+Route::get('/best-sellers', function () {
+    $produits = Produit::orderBy('stock', 'asc')->take(12)->get();
+    return inertia('Home/home', [
+        'produits' => $produits
+    ]);
+})->name('best-sellers');
 
-    // Envoyer un mail au client (optionnel, via formulaire)
-    Route::post('/commandes/{commande}/contact', [CommandeController::class, 'contactClient'])
-        ->name('commandes.contactClient');
-});
-    // bestseller
-    Route::get('/best-sellers', function () {
-        // Produits les plus vendus = ceux avec le moins de stock
-        $produits = Produit::orderBy('stock', 'asc')->take(12)->get();
-
-        return inertia('Home/home', [
-            'produits' => $produits
-        ]);
-    });
-    // shop route 
+// ------------------ SHOP ------------------
 Route::get('/shop', function () {
     $produits = Produit::with(['categorie', 'couleur'])->get();
     $categories = Categorie::pluck('nom');
     $couleurs = Couleur::pluck('nom');
 
-    return inertia::render('Shop/Index', [
+    return Inertia::render('Shop/Index', [
         'produits' => $produits,
         'categories' => $categories,
         'couleurs' => $couleurs,
     ]);
-});
-    // Blog
-    Route::resource('blogs', BlogController::class);
-    // contact 
-    Route::get('/Contact', [AdresseController::class, 'contact'])->name('contact');
+})->name('shop');
 
+// ------------------ CONTACT ------------------
+Route::get('/Contact', [AdresseController::class, 'contact'])->name('contact');
+
+// ------------------ ADMIN ------------------
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    
+    // Dashboard admin → redirection vers /admin/home
+    Route::get('/dashboard', function () {
+        if (auth()->user()->role === 'admin') {
+            return redirect('/admin/home');
+        }
+        return Inertia::render('Dashboard');
+    })->middleware(['auth', 'verified'])->name('dashboard');
+
+    // Page home admin
+    Route::get('/home', function () {
+        return Inertia::render('Admin/home');
+    })->middleware(['auth', 'verified'])->name('home');
+
+    // CRUD Admin généraux
+    Route::resource('users', UserController::class);
+    Route::resource('orders', CommandeController::class);
+    Route::resource('blog', BlogController::class);
+    Route::resource('products', ProduitController::class);
+    Route::resource('mailbox', MailboxController::class);
+
+    // CRUD spécifiques pour la page Category (les 3)
+    Route::resource('tags', TagController::class);
+    Route::resource('categories', CategorieController::class);
+    Route::resource('blog-categories', CategorieBlogController::class);
+
+    // Page qui rassemble les 3 CRUD
+    Route::get('/Category', function () {
+        return Inertia::render('Admin/Category', [
+            'tags' => Tag::all(),
+            'blogCategories' => CategorieBlog::all(),
+            'productCategories' => Categorie::all(),
+        ]);
+    })->name('category');
+});
+
+// ------------------ AUTH ------------------
 require __DIR__.'/auth.php';

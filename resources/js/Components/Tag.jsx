@@ -2,28 +2,21 @@ import { useForm, usePage, Link } from "@inertiajs/react";
 
 export default function Tag() {
   const { tags, flash } = usePage().props;
-  const { data, setData, post, delete: destroy, reset } = useForm({
+  const { data, setData, post, delete: destroy, reset, wasSuccessful } = useForm({
     nom: "",
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    post(route("admin.tags.store"), {
-      onSuccess: () => reset(), // vide l'input si succès
-    });
+    post(route("admin.tags.store"), { onSuccess: () => reset() });
   };
 
   return (
     <div className="container py-5">
       <h2 className="fw-bold mb-4">Tags de Blog</h2>
-
-      {/* Message flash */}
-      {flash?.success && (
-        <div className="alert alert-success mb-3">
-          {flash.success}
-        </div>
-      )}
-
+        {flash?.success && (
+            <p>{flash?.success}</p>
+        )}
       {/* Formulaire */}
       <form onSubmit={handleSubmit} className="d-flex gap-2 mb-4">
         <input
@@ -60,4 +53,3 @@ export default function Tag() {
     </div>
   );
 }
-

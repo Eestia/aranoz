@@ -3,6 +3,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "../../css/app.css";
+import { Link } from "@inertiajs/react";
 
 export default function CarouselProduits({ produits = [], categories = [], couleurs = [] }) {
   const items = Array.isArray(produits) ? produits : Object.values(produits);
@@ -148,16 +149,24 @@ export default function CarouselProduits({ produits = [], categories = [], coule
                       return (
                         <div key={produit.id} className="col-md-3 col-sm-6">
                           <div className="card h-100 border-0 text-center">
-                            <img
-                              src={`/storage/${produit.image_path}`}
-                              alt={produit.titre}
-                              className="card-img-top img-fluid"
-                              style={{ objectFit: "contain", maxHeight: 200 }}
-                            />
+                            <Link href={route("produits.show", produit.slug)}>
+                              <img
+                                src={`/storage/${produit.image_path}`}
+                                alt={produit.titre}
+                                className="card-img-top img-fluid"
+                                style={{ objectFit: "contain", maxHeight: 200 }}
+                              />
+                            </Link>
                             <div className="card-body">
                               <h6 className="fw-bold text-capitalize">
-                                {produit.titre}
+                                <Link
+                                  href={route("produits.show", produit.id)}
+                                  className="text-decoration-none text-dark"
+                                >
+                                  {produit.titre}
+                                </Link>
                               </h6>
+
                               {prixReduit ? (
                                 <p className="mb-0">
                                   <span className="text-decoration-line-through text-muted">
@@ -168,9 +177,7 @@ export default function CarouselProduits({ produits = [], categories = [], coule
                                   </span>
                                 </p>
                               ) : (
-                                <p className="fw-bold mb-0">
-                                  {formatPrice(produit.prix)}€
-                                </p>
+                                <p className="fw-bold mb-0">{formatPrice(produit.prix)}€</p>
                               )}
                             </div>
                           </div>

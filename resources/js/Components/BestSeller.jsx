@@ -1,5 +1,6 @@
 import React from "react";
 import Slider from "react-slick";
+import { Link } from "@inertiajs/react";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "../../css/app.css";
@@ -37,7 +38,9 @@ export default function BestSellersCarousel({ produits = [] }) {
     <div className="container my-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="fw-bold">Best Sellers</h2>
-        <a href="#" className="text-muted fw-bold">Shop</a>
+        <Link href={route("produits.index")} className="text-muted fw-bold">
+          Shop
+        </Link>
       </div>
 
       <Slider {...settings}>
@@ -53,14 +56,26 @@ export default function BestSellersCarousel({ produits = [] }) {
                 return (
                   <div key={produit.id} className="col-md-3 col-sm-6">
                     <div className="card h-100 border-0 text-center">
-                      <img
-                        src={`/storage/${produit.image_path}`}
-                        alt={produit.titre}
-                        className="card-img-top img-fluid"
-                        style={{ objectFit: "contain", maxHeight: 200 }}
-                      />
+                      {/* Image cliquable */}
+                      <Link href={route("produits.show", produit.slug)}>
+                        <img
+                          src={`/storage/${produit.image_path}`}
+                          alt={produit.titre}
+                          className="card-img-top img-fluid"
+                          style={{ objectFit: "contain", maxHeight: 200 }}
+                        />
+                      </Link>
+
                       <div className="card-body">
-                        <h6 className="fw-bold text-capitalize">{produit.titre}</h6>
+                        <h6 className="fw-bold text-capitalize">
+                          <Link
+                            href={route("produits.show", produit.slug)}
+                            className="text-decoration-none text-dark"
+                          >
+                            {produit.titre}
+                          </Link>
+                        </h6>
+
                         {prixReduit ? (
                           <p className="mb-0">
                             <span className="text-decoration-line-through text-muted">

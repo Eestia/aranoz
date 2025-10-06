@@ -15,19 +15,20 @@ class TagController extends Controller
     {
         $this->authorizeResource(Tag::class, 'tag');
     }
+
     // Liste des tags
     public function index()
     {
         $tags = Tag::all();
-        return Inertia::render('Categories/Index', [
+        return Inertia::render('Admin/Category', [
             'tags' => $tags
         ]);
     }
 
-    // Formulaire de création
+    // Formulaire de création (facultatif, tu bosses sûrement en modal dans Admin/Category)
     public function create()
     {
-        return Inertia::render('Categories/Create');
+        return Inertia::render('Admin/Category');
     }
 
     // Création d'un tag
@@ -39,14 +40,16 @@ class TagController extends Controller
 
         Tag::create($validated);
 
-        return Inertia::location("/categories/index");
+        return redirect()
+            ->route('admin.category')
+            ->with('success', 'Tag ajouté avec succès !');
     }
 
-    // Formulaire d'édition
+    // Formulaire d'édition (facultatif si tu fais inline)
     public function edit($id)
     {
         $tag = Tag::findOrFail($id);
-        return Inertia::render('Categories/Edit', [
+        return Inertia::render('Admin/Category', [
             'tag' => $tag
         ]);
     }
@@ -62,7 +65,7 @@ class TagController extends Controller
 
         $tag->update($validated);
 
-        return Inertia::location("/categories/index");
+        return redirect()->route('admin.category');
     }
 
     // Suppression d'un tag
@@ -71,13 +74,12 @@ class TagController extends Controller
         $tag = Tag::findOrFail($id);
 
         // Optionnel : vérifier si le tag est utilisé par des articles
-        if ($tag->blogs()->count() > 0) {
+        if (method_exists($tag, 'blogs') && $tag->blogs()->count() > 0) {
             return back()->with('error', 'Impossible de supprimer un tag utilisé par des articles.');
         }
 
         $tag->delete();
 
-        return Inertia::location("/categories/index");
+        return redirect()->route('admin.category');
     }
-
 }
