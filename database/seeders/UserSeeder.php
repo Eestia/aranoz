@@ -51,7 +51,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'role_id' => 4,
                 'phone' =>"0123 48 14 44",
-                'photo' => 'profil_pic/webmasteur.png',
+                'photo' => 'profil_pic/webmaster.png',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

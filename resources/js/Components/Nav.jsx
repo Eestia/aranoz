@@ -44,14 +44,14 @@ export default function Nav() {
                   </a>
                   <ul className="dropdown-menu">
                     <li>
-                      <a className="dropdown-item" href="/admin/Category">
+                      <a className="dropdown-item" href={route('admin.category')}>
                         Category
                       </a>
                     </li>
                     <li>
-                      <a className="dropdown-item" href="#">
+                      <Link href={route('admin.contact.edit')} className="dropdown-item">
                         Contact
-                      </a>
+                      </Link>
                     </li>
                   </ul>
                 </li>
@@ -66,8 +66,8 @@ export default function Nav() {
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link" href={route("admin.blog.index")}>
-                    Blog
+                  <Link className="nav-link" href={route("admin.blogs.index")}>
+                    Blogs
                   </Link>
                 </li>
                 <li className="nav-item">

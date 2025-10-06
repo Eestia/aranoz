@@ -11,12 +11,9 @@ class AdresseController extends Controller
 {
     use AuthorizesRequests;
 
-    public function __construct()
-    {
-        $this->authorizeResource(\App\Models\Adresse::class, 'adresse');
-    }
-
-    //---------Afficher la page contact avec l’adresse de l’admin
+    // ---------------------------
+    // PAGE PUBLIQUE CONTACT
+    // ---------------------------
     public function contact()
     {
         $admin = User::with('adresse')->where('role_id', 1)->first();
@@ -26,28 +23,50 @@ class AdresseController extends Controller
         ]);
     }
 
-    // ✅ Créer ou mettre à jour l’adresse de l’utilisateur connecté
-    public function store(Request $request)
+    // ---------------------------
+    // PAGE ADMIN : FORMULAIRE D'ÉDITION
+    // ---------------------------
+    public function edit()
     {
-        $request->validate([
-            'rue'         => 'required|string',
-            'numero'      => 'required|string',
-            'ville'       => 'required|string',
-            'code_postal' => 'required|string',
-            'pays'        => 'required|string',
-            'code_pays'   => 'required|string',
+        $admin = User::with('adresse')->where('role_id', 1)->first();
+
+        return Inertia::render('Admin/Contact/Edit', [
+            'admin' => $admin
+        ]);
+    }
+
+    // ---------------------------
+    // UPDATE ADRESSE ADMIN
+    // ---------------------------
+    public function update(Request $request, User $admin)
+    {
+        $validated = $request->validate([
+            'rue'         => 'required|string|max:255',
+            'numero'      => 'required|string|max:50',
+            'ville'       => 'required|string|max:100',
+            'code_postal' => 'required|string|max:20',
+            'pays'        => 'required|string|max:100',
+            'phone'       => 'nullable|string|max:50',
+            'email'       => 'nullable|email|max:255',
         ]);
 
-        $user = $request->user();
+        // Données pour l’adresse uniquement
+        $adresseData = collect($validated)->except(['email', 'phone'])->toArray();
 
-        if ($user->adresse) {
-            // si l'utilisateur a déjà une adresse → update
-            $user->adresse->update($request->all());
+        // Si l’admin a déjà une adresse → update, sinon → création
+        if ($admin->adresse) {
+            $admin->adresse->update($adresseData);
         } else {
-            // sinon → création
-            $user->adresse()->create($request->all());
+            $admin->adresse()->create($adresseData);
         }
 
-        return back()->with('success', 'Adresse enregistrée avec succès.');
+        // Met à jour les infos de contact de l'utilisateur
+        $admin->update([
+            'phone' => $validated['phone'] ?? $admin->phone,
+            'email' => $validated['email'] ?? $admin->email,
+        ]);
+
+        return back()->with('success', 'Adresse mise à jour avec succès.');
     }
+
 }

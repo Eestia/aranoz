@@ -13,114 +13,139 @@ use Inertia\Inertia;
 class BlogController extends Controller
 {
     use AuthorizesRequests;
-    // Apelle automatiquement la bonne methode pour chaque role: 
+
     public function __construct()
     {
-       $this->authorizeResource(Blog::class, 'blog', [
-        'except' => ['index', 'show']
-    ]);
+        $this->authorizeResource(Blog::class, 'blog', [
+            'except' => ['index', 'show', 'adminIndex']
+        ]);
     }
-    // Liste des blogs
+
+    /* =======================
+     * 🔹 PARTIE PUBLIQUE
+     * ======================= */
+
+    // Page publique : liste des blogs
     public function index(Request $request)
     {
         $query = Blog::with(['categorie', 'tags'])->latest();
 
-        // Filtre par catégorie
+        // Filtres optionnels
         if ($request->filled('category')) {
-            $query->whereHas('categorie', function ($q) use ($request) {
-                $q->where('nom', $request->category);
-            });
+            $query->whereHas('categorie', fn($q) => $q->where('nom', $request->category));
         }
 
-        // Filtre par tag
         if ($request->filled('tag')) {
-            $query->whereHas('tags', function ($q) use ($request) {
-                $q->where('nom', $request->tag);
-            });
+            $query->whereHas('tags', fn($q) => $q->where('nom', $request->tag));
         }
 
-        // Filtre par recherche
         if ($request->filled('search')) {
             $query->where('titre', 'like', '%' . $request->search . '%');
         }
 
-        $blogs = $query->with(['categorie', 'tags'])->get();
+        $blogs = $query->get();
 
         return Inertia::render('Blog/Index', [
             'blogs' => $blogs,
             'categories' => CategorieBlog::all(),
             'tags' => Tag::all(),
             'recentBlogs' => Blog::latest()->take(4)->get(),
-            'filters' => $request->only(['category', 'tag', 'search']) // ✅ utile pour garder l’état côté React
+            'filters' => $request->only(['category', 'tag', 'search'])
+        ]);
+    }
+
+    // Page publique : un seul blog
+    public function show($id)
+    {
+        $blog = Blog::with(['categorie', 'tags'])->findOrFail($id);
+
+        return Inertia::render('Blog/show', [
+            'blog' => $blog
         ]);
     }
 
 
+    /* =======================
+     * 🔹 PARTIE ADMIN
+     * ======================= */
 
-    // Formulaire de création
+    // Tableau de bord des blogs (admin)
+    public function adminIndex()
+    {
+        $blogs = Blog::with('categorie')->latest()->get();
+
+        return Inertia::render('Admin/Blogs/Index', [
+            'blogs' => $blogs,
+        ]);
+    }
+
+    // Formulaire de création (admin)
     public function create()
     {
         $categories = Categorie::all();
-        return Inertia::render('Blog/create', [
+
+        return Inertia::render('Admin/Blogs/Create', [
             'categories' => $categories
         ]);
     }
 
-    // Création d'un blog
+    // Création d’un blog (admin)
     public function store(Request $request)
     {
         $validated = $request->validate([
             'categorie_id' => 'required|exists:categories,id',
             'titre' => 'required|string|max:255',
             'description' => 'required|string',
-            'image' => 'required|image|max:2048',
+            'image' => 'nullable|image|max:2048',
         ]);
 
-        $validated['image_path'] = $request->file('image')->store('blogs', 'public');
+        $validated['image_path'] = $request->hasFile('image')
+            ? $request->file('image')->store('blogs', 'public')
+            : 'default.jpg';
 
         Blog::create($validated);
 
-        return Inertia::location("/blogs/index");
+        return redirect()->route('admin.blogs.index')->with('success', 'Blog créé avec succès.');
     }
 
-    // Formulaire d'édition
+    // Formulaire d’édition (admin)
     public function edit($id)
     {
         $blog = Blog::findOrFail($id);
         $categories = Categorie::all();
 
-        return Inertia::render('Blog/Edit', [
+        return Inertia::render('Admin/Blogs/Edit', [
             'blog' => $blog,
-            'categories' => $categories
+            'categories' => $categories,
         ]);
     }
 
-    // Mise à jour d'un blog
+    // Mise à jour (admin)
     public function update(Request $request, $id)
     {
         $blog = Blog::findOrFail($id);
 
         $validated = $request->validate([
-            'categorie_id' => 'required|exists:categorie_blogs,id',
+            'categorie_id' => 'required|exists:categories,id',
             'titre' => 'required|string|max:255',
             'description' => 'required|string',
             'image' => 'nullable|image|max:2048',
         ]);
 
-        // Gestion de l'image
         if ($request->hasFile('image')) {
             if ($blog->image_path && file_exists(public_path('storage/'.$blog->image_path))) {
                 unlink(public_path('storage/'.$blog->image_path));
             }
+
             $validated['image_path'] = $request->file('image')->store('blogs', 'public');
         }
 
         $blog->update($validated);
 
-        return Inertia::location("/blogs/index");
+        return redirect()->route('admin.blogs.index')->with('success', 'Blog mis à jour avec succès.');
     }
 
-    // Suppression d'un blog
+    // Suppression (admin)
     public function destroy($id)
     {
         $blog = Blog::findOrFail($id);
@@ -131,14 +156,6 @@ class BlogController extends Controller
 
         $blog->delete();
 
-        return Inertia::location("/blogs/index");
+        return redirect()->route('admin.blogs.index')->with('success', 'Blog supprimé avec succès.');
     }
-    public function show($id)
-    {
-        $blog = Blog::with(['categorie', 'tags'])->findOrFail($id);
-
-        return Inertia::render('Blog/show', [
-            'blog' => $blog
-        ]);
-    }
-}   
+}
