@@ -8,19 +8,24 @@ use Inertia\Inertia;
 
 class CategorieBlogController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(CategorieBlog::class, 'categorie_blog');
+    }
+
     // Liste des catégories de blog
     public function index()
     {
         $categories = CategorieBlog::all();
-        return Inertia::render('Categories/Index', [
-            'categories' => $categories
+        return Inertia::render('Admin/Category', [
+            'blogCategories' => $categories, 
         ]);
     }
 
-    // Affiche le formulaire de création
+    // Formulaire de création (redirige simplement vers la page principale)
     public function create()
     {
-        return Inertia::render('Categories/Create');
+        return redirect()->route('admin.category');
     }
 
     // Crée une catégorie de blog
@@ -32,14 +37,16 @@ class CategorieBlogController extends Controller
 
         CategorieBlog::create($validated);
 
-        return Inertia::location("/categories/index");
+        return redirect()
+            ->route('admin.category')
+            ->with('success', 'Catégorie de blog ajoutée avec succès !');
     }
 
-    // Affiche le formulaire d'édition
+    // Formulaire d’édition
     public function edit($id)
     {
         $categorie = CategorieBlog::findOrFail($id);
-        return Inertia::render('Categories/Edit', [
+        return Inertia::render('Admin/Category', [
             'categorie' => $categorie
         ]);
     }
@@ -55,7 +62,9 @@ class CategorieBlogController extends Controller
 
         $categorie->update($validated);
 
-        return Inertia::location("/categories/index");
+        return redirect()
+            ->route('admin.category')
+            ->with('success', 'Catégorie de blog mise à jour avec succès !');
     }
 
     // Supprime une catégorie de blog
@@ -63,13 +72,15 @@ class CategorieBlogController extends Controller
     {
         $categorie = CategorieBlog::findOrFail($id);
 
-        // Optionnel : vérifier si des articles existent avant de supprimer
-        if ($categorie->blogs()->count() > 0) {
+        // Vérifier si des articles existent avant de supprimer
+        if (method_exists($categorie, 'blogs') && $categorie->blogs()->count() > 0) {
             return back()->with('error', 'Impossible de supprimer une catégorie ayant des articles.');
         }
 
         $categorie->delete();
 
-        return Inertia::location("/categories/index");
+        return redirect()
+            ->route('admin.category')
+            ->with('success', 'Catégorie de blog supprimée avec succès !');
     }
 }

@@ -1,63 +1,30 @@
-import { useForm, usePage, Link } from "@inertiajs/react";
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 
-export default function Tag() {
-  const { tags, flash } = usePage().props;
-  const { data, setData, post, delete: destroy, reset } = useForm({
-    nom: "",
-  });
+export default forwardRef(function TextInput(
+    { type = 'text', className = '', isFocused = false, ...props },
+    ref,
+) {
+    const localRef = useRef(null);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    post(route("admin.tags.store"), {
-      onSuccess: () => reset(), // vide l'input si succès
-    });
-  };
+    useImperativeHandle(ref, () => ({
+        focus: () => localRef.current?.focus(),
+    }));
 
-  return (
-    <div className="container py-5">
-      <h2 className="fw-bold mb-4">Tags de Blog</h2>
+    useEffect(() => {
+        if (isFocused) {
+            localRef.current?.focus();
+        }
+    }, [isFocused]);
 
-      {/* Message flash */}
-      {flash?.success && (
-        <div className="alert alert-success mb-3">
-          {flash.success}
-        </div>
-      )}
-
-      {/* Formulaire */}
-      <form onSubmit={handleSubmit} className="d-flex gap-2 mb-4">
+    return (
         <input
-          type="text"
-          value={data.nom}
-          onChange={(e) => setData("nom", e.target.value)}
-          className="form-control"
-          placeholder="Nouveau tag"
+            {...props}
+            type={type}
+            className={
+                'rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 ' +
+                className
+            }
+            ref={localRef}
         />
-        <button type="submit" className="btn btn-success">
-          Ajouter
-        </button>
-      </form>
-
-      {/* Liste */}
-      <ul className="list-group">
-        {tags.map((tag) => (
-          <li
-            key={tag.id}
-            className="list-group-item d-flex justify-content-between align-items-center"
-          >
-            {tag.nom}
-            <Link
-              href={route("admin.tags.destroy", tag.id)}
-              method="delete"
-              as="button"
-              className="btn btn-sm btn-danger"
-            >
-              Supprimer
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
+    );
+});

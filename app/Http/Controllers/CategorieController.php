@@ -14,7 +14,7 @@ class CategorieController extends Controller
     public function index()
     {
         $categories = Categorie::all();
-        return Inertia::render('Categories/Index', [
+        return Inertia::render('Admin/Category', [
             'categories' => $categories
         ]);
     }
@@ -22,7 +22,7 @@ class CategorieController extends Controller
     // AFFICHER FORMULAIRE de creation
     public function create()
     {
-        return Inertia::render('Categories/Create');
+        return redirect()->route('admin.category');
     }
 
     // CREE une categorie
@@ -37,14 +37,14 @@ class CategorieController extends Controller
 
         Categorie::create($validated);
 
-        return Inertia::location("/categories/index");
+        return redirect()->route('admin.category');
     }
 
     // AFFICHER formulaire d'edition
     public function edit($id)
     {
         $categorie = Categorie::findOrFail($id);
-        return Inertia::render('Categories/Edit', [
+        return Inertia::render('Admin/Category', [
             'categorie' => $categorie
         ]);
     }
@@ -62,7 +62,7 @@ class CategorieController extends Controller
 
         $categorie->update($validated);
 
-        return Inertia::location("/categories/index");
+        return redirect()->route('admin.category');
     }
 
     // SUPPRIME une catégorie
@@ -70,13 +70,13 @@ class CategorieController extends Controller
     {
         $categorie = Categorie::findOrFail($id);
 
-        // vérifie si des produits existent avant de supprimer
+        // Vérifie si des produits existent
         if ($categorie->produits()->count() > 0) {
             return back()->with('error', 'Impossible de supprimer une catégorie ayant des produits.');
         }
 
         $categorie->delete();
 
-        return Inertia::location("/categories/index");
+        return redirect()->route('admin.category')->with('success', 'Catégorie supprimée avec succès.');
     }
 }

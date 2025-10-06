@@ -1,25 +1,25 @@
 import React from "react";
 import { useForm, usePage, router } from "@inertiajs/react";
 
-export default function Tag() {
-    const { tags, flash } = usePage().props;
+export default function BlogCategory({ blogCategories }) {
+    const { auth } = usePage().props;
 
-    // Formulaire d’ajout
+    // Formulaire d'ajout
     const { data, setData, post, reset, errors } = useForm({
         nom: "",
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route("admin.tags.store"), {
+        post(route("admin.blog-categories.store"), {
             onSuccess: () => reset(),
         });
     };
 
     // Suppression
     const handleDelete = (id) => {
-        if (confirm("Supprimer ce tag ?")) {
-            router.delete(route("admin.tags.destroy", id));
+        if (confirm("Supprimer cette catégorie de blog ?")) {
+            router.delete(route("admin.blog-categories.destroy", id));
         }
     };
 
@@ -27,18 +27,18 @@ export default function Tag() {
         <div className="container mt-4">
             <div className="card shadow">
                 <div className="card-header bg-white text-black">
-                    <h4 className="mb-0">Tags de Blog</h4>
+                    <h4 className="mb-0">Catégories de Blog</h4>
                 </div>
                 <div className="card-body">
                     
-                    {/* Formulaire ajout */}
+                    {/* Formulaire création */}
                     <form onSubmit={handleSubmit} className="row g-2 mb-3">
                         <div className="col-md-8">
                             <input
                                 type="text"
                                 value={data.nom}
                                 onChange={(e) => setData("nom", e.target.value)}
-                                placeholder="Nom du tag"
+                                placeholder="Nom de la catégorie"
                                 className="form-control"
                             />
                             {errors.nom && (
@@ -67,14 +67,14 @@ export default function Tag() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {tags.length > 0 ? (
-                                    tags.map((tag, index) => (
-                                        <tr key={tag.id}>
+                                {blogCategories.length > 0 ? (
+                                    blogCategories.map((cat, index) => (
+                                        <tr key={cat.id}>
                                             <td>{index + 1}</td>
-                                            <td>{tag.nom}</td>
+                                            <td>{cat.nom}</td>
                                             <td className="text-center">
                                                 <button
-                                                    onClick={() => handleDelete(tag.id)}
+                                                    onClick={() => handleDelete(cat.id)}
                                                     className="btn btn-sm btn-danger"
                                                 >
                                                     Supprimer
@@ -85,7 +85,7 @@ export default function Tag() {
                                 ) : (
                                     <tr>
                                         <td colSpan="3" className="text-center text-muted">
-                                            Aucun tag disponible
+                                            Aucune catégorie disponible
                                         </td>
                                     </tr>
                                 )}

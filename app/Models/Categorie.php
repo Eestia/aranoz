@@ -6,8 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Categorie extends Model
 {
-    public function produit()
+    protected $fillable = ['nom', 'slug'];
+
+    /**
+     * Relation : une catégorie possède plusieurs produits
+     */
+    public function produits()
     {
-        return $this->hasMany(Produit::class);
+        return $this->hasMany(Produit::class, 'categorie_id');
     }
 }
