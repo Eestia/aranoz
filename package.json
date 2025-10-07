@@ -26,6 +26,7 @@
         "bootstrap": "^5.3.8",
         "framer-motion": "^12.23.22",
         "lucide-react": "^0.544.0",
+        "react-bootstrap-icons": "^1.11.6",
         "react-slick": "^0.31.0",
         "slick-carousel": "^1.8.1",
         "sweetalert2": "^11.24.0"

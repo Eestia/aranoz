@@ -1,16 +1,16 @@
 import React from "react";
-import { Link , router } from "@inertiajs/react";
-import BreadcrumbAdmin from '@/Components/BreadcrumbAdmin';
-import Back from "../../../Layouts/Back"
+import { Link, router } from "@inertiajs/react";
+import BreadcrumbAdmin from "@/Components/BreadcrumbAdmin";
+import Back from "../../../Layouts/Back";
 
 export default function Index({ users }) {
   return (
     <Back>
-    <BreadcrumbAdmin title="Users" subtitle="Aranoz - Users" />
+      <BreadcrumbAdmin title="Users" subtitle="Aranoz - Users" />
       <div className="container py-5">
         <h2 className="fw-bold mb-4">Liste des utilisateurs</h2>
 
-        <table className="table table-striped align-middle text-center">
+        <table className="table table-striped align-middle text-center shadow-sm rounded">
           <thead className="table-dark">
             <tr>
               <th>Avatar</th>
@@ -26,9 +26,13 @@ export default function Index({ users }) {
               <tr key={user.id}>
                 <td>
                   <img
-                    src={user.photo ? `/storage/${user.photo}` : "https://via.placeholder.com/40"}
+                    src={
+                      user.photo
+                        ? `/storage/${user.photo}`
+                        : "https://via.placeholder.com/40"
+                    }
                     alt={user.name}
-                    className="rounded-circle"
+                    className="rounded-circle shadow-sm"
                     width="40"
                     height="40"
                   />
@@ -56,22 +60,29 @@ export default function Index({ users }) {
                     : "-"}
                 </td>
                 <td>
-                  <Link
-                    href={route("admin.users.edit", user.id)}
-                    className="text-primary"
+                  <div className="d-flex justify-content-center gap-2">
+                    <Link
+                      href={route("admin.users.edit", user.id)}
+                      className="btn btn-sm btn-primary"
                     >
-                    Edit
-                  </Link>
-                  <button
-                    onClick={() => {
-                        if (confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) {
-                        router.delete(route("admin.users.destroy", user.id));
+                      Edit
+                    </Link>
+
+                    <button
+                      onClick={() => {
+                        if (
+                          confirm(
+                            "Voulez-vous vraiment supprimer cet utilisateur ?"
+                          )
+                        ) {
+                          router.delete(route("admin.users.destroy", user.id));
                         }
-                    }}
-                    className="btn btn-danger btn-sm"
+                      }}
+                      className="btn btn-sm btn-danger"
                     >
-                    Delete
-                  </button>
+                      Delete
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Categorie;
 use App\Models\Couleur;
 use App\Models\Produit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
@@ -16,145 +18,164 @@ class ProduitController extends Controller
     {
         $this->authorizeResource(Produit::class, 'produit');
     }
-    public function show(Produit $produit)
+
+    /* =======================
+     * 🔹 ADMIN : INDEX
+     * ======================= */
+    public function index()
     {
-        $this->authorize('view', $produit); // <-- attention ici
-        return Inertia::render('produits/show', ['produit' => $produit]);
+        $produits = Produit::with(['categorie', 'couleur'])->latest()->get();
+
+        return Inertia::render('Admin/Products/Index', [
+            'produits' => $produits,
+        ]);
     }
 
+    /* =======================
+     * 🔹 SHOW
+     * ======================= */
+    public function show(Produit $produit)
+    {
+        $this->authorize('view', $produit);
+
+        return Inertia::render('Admin/Products/Show', [
+            'produit' => $produit->load(['categorie', 'couleur']),
+        ]);
+    }
+
+    /* =======================
+     * 🔹 CREATE
+     * ======================= */
+    public function create()
+    {
+        return Inertia::render('Admin/Products/Create', [
+            'categories' => Categorie::all(),
+            'couleurs' => Couleur::all(),
+        ]);
+    }
+
+    /* =======================
+     * 🔹 STORE
+     * ======================= */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'titre'=>'require|string|max:255',
-            'description'=>'require|string',
-            'prix'=>'require|integer|min:0',
-            'image'=>'require|image',
-            'image2'=>'require|image',
-            'image3'=>'require|image',
-            'en_reduction' => 'nullable|boolean',
-            'reduction_pct' => 'nullable|integer|min:0|max:100',
+            'titre' => 'required|string|max:255',
+            'description' => 'required|string',
+            'prix' => 'required|integer|min:0',
             'stock' => 'required|integer|min:0',
             'couleur_id' => 'required|exists:couleurs,id',
             'categorie_id' => 'required|exists:categories,id',
+            'en_reduction' => 'nullable|boolean',
+            'reduction_pct' => 'nullable|integer|min:0|max:100',
             'is_pinned' => 'boolean',
+            'image' => 'nullable|image|max:2048',
+            'image2' => 'nullable|image|max:2048',
+            'image3' => 'nullable|image|max:2048',
         ]);
 
-        // Si la checkbox n’est pas cochée, on force à false
-        $validated['is_pinned'] = $request->has('is_pinned');
+        // 🧠 Génération automatique du slug
+        $validated['slug'] = Str::slug($validated['titre']);
 
-        $path = $request->file('image')->store('produits','public');
+        // 📸 Uploads des images
+        foreach (['image', 'image2', 'image3'] as $img) {
+            if ($request->hasFile($img)) {
+                $validated["{$img}_path"] = $request->file($img)->store('produits', 'public');
+            }
+        }
 
-        //création d'un produit
-        Produit::create([
-            'titre'=>$validated['titre'],
-            'description'=>$validated['description'],
-            'prix'=>$validated['prix'],
-            'image_path'=>$path,
-            'image2_path'=>$path,
-            'image3_path'=>$path,
-            'en_reduction' => $validated['en_reduction'] ?? false,
-            'reduction_pct' => $validated['reduction_pct'] ?? null,
-            'stock' => $validated['stock'],
-            'couleur_id' => $validated['couleur_id'],
-            'categorie_id' => $validated['categorie_id'],
-        ]);
-        
-        return Inertia::location("/produits/index");
+        Produit::create($validated);
 
+        return redirect()->route('admin.products.index')->with('success', 'Produit ajouté avec succès.');
     }
-    // supression d'un produit: 
-    public function destroy($id)
+
+    /* =======================
+     * 🔹 EDIT
+     * ======================= */
+    public function edit(Produit $produit)
     {
-        // on récupère le produit exacte
-        $produit = Produit::findOrFail($id);
+        return Inertia::render('Admin/Products/Edit', [
+            'produit' => $produit,
+            'categories' => Categorie::all(),
+            'couleurs' => Couleur::all(),
+        ]);
+    }
 
-        // Supprime les images du serveur si elles existent
-        if ($produit->image_path && file_exists(public_path($produit->image_path))) {
-            unlink(public_path($produit->image_path));
-        }
-        if ($produit->image2_path && file_exists(public_path($produit->image2_path))) {
-            unlink(public_path($produit->image2_path));
-        }
-        if ($produit->image3_path && file_exists(public_path($produit->image3_path))) {
-            unlink(public_path($produit->image3_path));
+    /* =======================
+     * 🔹 UPDATE
+     * ======================= */
+    public function update(Request $request, Produit $produit)
+    {
+        $validated = $request->validate([
+            'titre' => 'required|string|max:255',
+            'description' => 'required|string',
+            'prix' => 'required|integer|min:0',
+            'stock' => 'required|integer|min:0',
+            'couleur_id' => 'required|exists:couleurs,id',
+            'categorie_id' => 'required|exists:categories,id',
+            'en_reduction' => 'nullable|boolean',
+            'reduction_pct' => 'nullable|integer|min:0|max:100',
+            'is_pinned' => 'boolean',
+            'image' => 'nullable|image|max:2048',
+            'image2' => 'nullable|image|max:2048',
+            'image3' => 'nullable|image|max:2048',
+        ]);
+
+        // 🧠 Regénération du slug si le titre change
+        if ($produit->titre !== $validated['titre']) {
+            $validated['slug'] = Str::slug($validated['titre']);
         }
 
-        // Supprime le produit de la base de données
+        // 📸 Gestion des images
+        foreach (['image', 'image2', 'image3'] as $img) {
+            $pathKey = "{$img}_path";
+            if ($request->hasFile($img)) {
+                if ($produit->$pathKey && file_exists(public_path("storage/{$produit->$pathKey}"))) {
+                    unlink(public_path("storage/{$produit->$pathKey}"));
+                }
+                $validated[$pathKey] = $request->file($img)->store('produits', 'public');
+            }
+        }
+
+        $produit->update($validated);
+
+        return redirect()->route('admin.products.index')->with('success', 'Produit mis à jour avec succès.');
+    }
+
+    /* =======================
+     * 🔹 DESTROY
+     * ======================= */
+    public function destroy(Produit $produit)
+    {
+        foreach (['image_path', 'image2_path', 'image3_path'] as $imgPath) {
+            if ($produit->$imgPath && file_exists(public_path("storage/{$produit->$imgPath}"))) {
+                unlink(public_path("storage/{$produit->$imgPath}"));
+            }
+        }
+
         $produit->delete();
 
-        return Inertia::location("/produits/index");
-        }
-        //affichage de la page edit: 
-        public function edit($id)
-        {
-            $produit = Produit::findOrFail($id);
+        return redirect()->route('admin.products.index')->with('success', 'Produit supprimé avec succès.');
+    }
 
-            return Inertia::render('produits/edit', [
-                'produit' => $produit
-            ]);
-        }
-        // methode update:
-        public function update(Request $request, $id)
-        {
-            $produit = Produit::findOrFail($id);
+    /* =======================
+     * 🔹 PRODUITS ÉPINGLÉS
+     * ======================= */
+    public function pinned()
+    {
+        $pinnedProducts = Produit::where('is_pinned', true)->latest()->take(4)->get();
 
-            $validated = $request->validate([
-                'titre' => 'required|string|max:255',
-                'description' => 'required|string',
-                'prix' => 'required|integer|min:0',
-                'image' => 'nullable|image|max:2048',
-                'image2' => 'nullable|image|max:2048',
-                'image3' => 'nullable|image|max:2048',
-                'en_reduction' => 'nullable|boolean',
-                'reduction_pct' => 'nullable|integer|min:0|max:100',
-                'stock' => 'required|integer|min:0',
-                'couleur_id' => 'required|exists:couleurs,id',
-                'categorie_id' => 'required|exists:categories,id',
-            ]);
+        return Inertia::render('Home/home', [
+            'produits' => $pinnedProducts,
+        ]);
+    }
 
-            // Gestion des images
-            if ($request->hasFile('image')) {
-                if ($produit->image_path && file_exists(public_path($produit->image_path))) {
-                    unlink(public_path($produit->image_path));
-                }
-                $validated['image_path'] = $request->file('image')->store('produits', 'public');
-            }
-            if ($request->hasFile('image2')) {
-                if ($produit->image2_path && file_exists(public_path($produit->image2_path))) {
-                    unlink(public_path($produit->image2_path));
-                }
-                $validated['image2_path'] = $request->file('image2')->store('produits', 'public');
-            }
-            if ($request->hasFile('image3')) {
-                if ($produit->image3_path && file_exists(public_path($produit->image3_path))) {
-                    unlink(public_path($produit->image3_path));
-                }
-                $validated['image3_path'] = $request->file('image3')->store('produits', 'public');
-            }
-
-            // Met à jour le produit
-            $produit->update($validated);
-
-            return Inertia::location("/produits/index");
-        }
-        public function pinned()
-        {
-            // Aucune restriction : tout le monde (même non connecté) peut voir les produits pin
-            $pinnedProducts = Produit::where('is_pinned', true)
-                                    ->latest()
-                                    ->take(4)
-                                    ->get();
-
-            // Envoie les données au front (Inertia)
-            return Inertia::render('Home/home', [
-                'produits' => $pinnedProducts
-            ]);
-        }
-
-        public function bestSellers()
-        {
-            $produits = Produit::orderBy('stock', 'asc')->take(20)->get(); // ex: top 20
-            return response()->json($produits);
-        }
-
+    /* =======================
+     * 🔹 BEST SELLERS
+     * ======================= */
+    public function bestSellers()
+    {
+        $produits = Produit::orderBy('stock', 'asc')->take(20)->get();
+        return response()->json($produits);
+    }
 }
