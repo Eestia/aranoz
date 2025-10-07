@@ -3,11 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Blog;
-use App\Models\Categorie;
 use App\Models\CategorieBlog;
 use App\Models\Tag;
 use Illuminate\Http\Request;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests; 
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Inertia\Inertia;
 
 class BlogController extends Controller
@@ -25,7 +24,6 @@ class BlogController extends Controller
      * 🔹 PARTIE PUBLIQUE
      * ======================= */
 
-    // Page publique : liste des blogs
     public function index(Request $request)
     {
         $query = Blog::with(['categorie', 'tags'])->latest();
@@ -50,26 +48,20 @@ class BlogController extends Controller
             'categories' => CategorieBlog::all(),
             'tags' => Tag::all(),
             'recentBlogs' => Blog::latest()->take(4)->get(),
-            'filters' => $request->only(['category', 'tag', 'search'])
+            'filters' => $request->only(['category', 'tag', 'search']),
         ]);
     }
 
-    // Page publique : un seul blog
     public function show($id)
     {
         $blog = Blog::with(['categorie', 'tags'])->findOrFail($id);
-
-        return Inertia::render('Blog/show', [
-            'blog' => $blog
-        ]);
+        return inertia('Admin/Blogs/Show', ['blog' => $blog]);
     }
-
 
     /* =======================
      * 🔹 PARTIE ADMIN
      * ======================= */
 
-    // Tableau de bord des blogs (admin)
     public function adminIndex()
     {
         $blogs = Blog::with('categorie')->latest()->get();
@@ -79,83 +71,101 @@ class BlogController extends Controller
         ]);
     }
 
-    // Formulaire de création (admin)
     public function create()
     {
-        $categories = Categorie::all();
-
-        return Inertia::render('Admin/Blogs/Create', [
-            'categories' => $categories
+        return inertia('Admin/Blogs/Create', [
+            'categories' => CategorieBlog::all(),
+            'tags' => Tag::all(),
         ]);
     }
 
-    // Création d’un blog (admin)
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'categorie_id' => 'required|exists:categories,id',
             'titre' => 'required|string|max:255',
             'description' => 'required|string',
-            'image' => 'nullable|image|max:2048',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'categorie_id' => 'required|exists:categorie_blogs,id',
+            'tags' => 'array',
         ]);
 
-        $validated['image_path'] = $request->hasFile('image')
-            ? $request->file('image')->store('blogs', 'public')
-            : 'default.jpg';
+        $blog = new Blog();
+        $blog->titre = $validated['titre'];
+        $blog->description = $validated['description'];
+        $blog->categorie_id = $validated['categorie_id'];
 
-        Blog::create($validated);
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('blogs', 'public');
+            $blog->image_path = $path;
+        }
 
-        return redirect()->route('admin.blogs.index')->with('success', 'Blog créé avec succès.');
+        $blog->save();
+
+        if (!empty($validated['tags'])) {
+            $blog->tags()->sync($validated['tags']);
+        }
+
+        return redirect()->route('admin.blogs.index')->with('success', 'Blog created successfully!');
     }
 
-    // Formulaire d’édition (admin)
+
     public function edit($id)
     {
-        $blog = Blog::findOrFail($id);
-        $categories = Categorie::all();
+        $blog = Blog::with('tags')->findOrFail($id);
+        $categories = CategorieBlog::all();
+        $tags = Tag::all();
 
         return Inertia::render('Admin/Blogs/Edit', [
             'blog' => $blog,
             'categories' => $categories,
+            'tags' => $tags,
         ]);
     }
 
-    // Mise à jour (admin)
     public function update(Request $request, $id)
     {
         $blog = Blog::findOrFail($id);
 
         $validated = $request->validate([
-            'categorie_id' => 'required|exists:categories,id',
+            'categorie_id' => 'required|exists:categorie_blogs,id',
             'titre' => 'required|string|max:255',
             'description' => 'required|string',
             'image' => 'nullable|image|max:2048',
+            'tag_ids' => 'array',
         ]);
 
+        // Gestion de l'image
         if ($request->hasFile('image')) {
-            if ($blog->image_path && file_exists(public_path('storage/'.$blog->image_path))) {
-                unlink(public_path('storage/'.$blog->image_path));
+            if ($blog->image_path && file_exists(public_path('storage/' . $blog->image_path))) {
+                unlink(public_path('storage/' . $blog->image_path));
             }
 
             $validated['image_path'] = $request->file('image')->store('blogs', 'public');
         }
 
-        $blog->update($validated);
+        $blog->update([
+            'categorie_id' => $validated['categorie_id'],
+            'titre' => $validated['titre'],
+            'description' => $validated['description'],
+            'image_path' => $validated['image_path'] ?? $blog->image_path,
+        ]);
 
-        return redirect()->route('admin.blogs.index')->with('success', 'Blog mis à jour avec succès.');
+        $blog->tags()->sync($request->input('tag_ids', []));
+
+        return Inertia::location(route('admin.blogs.index'));
     }
 
-    // Suppression (admin)
     public function destroy($id)
     {
         $blog = Blog::findOrFail($id);
 
-        if ($blog->image_path && file_exists(public_path('storage/'.$blog->image_path))) {
-            unlink(public_path('storage/'.$blog->image_path));
+        if ($blog->image_path && file_exists(public_path('storage/' . $blog->image_path))) {
+            unlink(public_path('storage/' . $blog->image_path));
         }
 
         $blog->delete();
 
         return redirect()->route('admin.blogs.index')->with('success', 'Blog supprimé avec succès.');
     }
+
 }

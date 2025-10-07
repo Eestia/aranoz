@@ -1,6 +1,31 @@
 import { Link, router } from "@inertiajs/react";
 import AdminLayout from "@/Layouts/AdminLayout";
 import Back from "../../../Layouts/Back";
+import Swal from "sweetalert2"; 
+import BreadcrumbAdmin from '../../../Components/BreadcrumbAdmin';
+
+function handleDelete(id) {
+  Swal.fire({
+    title: "Are you sure?",
+    text: "This blog will be permanently deleted!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete it!",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      router.delete(route("admin.blogs.destroy", id), {
+        onSuccess: () => {
+          Swal.fire("Deleted!", "The blog has been removed.", "success");
+        },
+        onError: () => {
+          Swal.fire("Error", "Something went wrong!", "error");
+        },
+      });
+    }
+  });
+}
 
 export default function BlogIndex({ blogs }) {
   const handleDelete = (id) => {
@@ -11,6 +36,7 @@ export default function BlogIndex({ blogs }) {
 
   return (
     <Back>
+      <BreadcrumbAdmin title="Dashboard" subtitle="Aranoz - Blog section" />
       <div className="container py-5">
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h2 className="fw-bold">All Blogs</h2>
@@ -43,9 +69,12 @@ export default function BlogIndex({ blogs }) {
                   />
                 </td>
                 <td>{blog.titre}</td>
-                <td>{blog.categorie?.nom || "—"}</td>
+                <td>{blog.categorie ? blog.categorie.nom : "—"}</td>
                 <td>
-                  <Link href="#" className="btn btn-light btn-sm">
+                  <Link
+                    href={route("admin.blogs.show", blog.id)}
+                    className="btn btn-light btn-sm"
+                  >
                     Show
                   </Link>
                 </td>
@@ -59,11 +88,11 @@ export default function BlogIndex({ blogs }) {
                 </td>
                 <td>
                   <button
-                    onClick={() => handleDelete(blog.id)}
-                    className="btn btn-danger btn-sm"
-                  >
-                    Delete
-                  </button>
+                  onClick={() => handleDelete(blog.id)}
+                  className="btn btn-danger btn-sm"
+                >
+                  Delete
+                </button>
                 </td>
               </tr>
             ))}

@@ -7,11 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class Blog extends Model
 {
     protected $fillable = [
-        'titre','description','image_path','categorie_id'
+        'titre',
+        'description',
+        'image_path',
+        'categorie_id',
     ];
     public function tags()
     {
-        return $this->belongsToMany(Tag::class);
+        return $this->belongsToMany(Tag::class, 'blog_tag');
     }
 
     public function categorie()
@@ -23,4 +26,9 @@ class Blog extends Model
     {
         return $this->hasMany(Commentaire::class);
     }
+    // relation vers categorie_blog
+    // public function categorieBlog()
+    // {
+    //     return $this->belongsTo(\App\Models\CategorieBlog::class, 'categorie_blog_id');
+    // }
 }

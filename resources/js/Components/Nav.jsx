@@ -135,7 +135,7 @@ export default function Nav() {
                   </ul>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link" href="/Contact">
+                  <a className="nav-link" href="/contact">
                     Contact
                   </a>
                 </li>

@@ -103,6 +103,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/blogs/{id}/edit', [BlogController::class, 'edit'])->name('blogs.edit');
     Route::put('/blogs/{id}', [BlogController::class, 'update'])->name('blogs.update');
     Route::delete('/blogs/{id}', [BlogController::class, 'destroy'])->name('blogs.destroy');
+    Route::get('/blogs/{id}', [BlogController::class, 'show'])->name('blogs.show');
+
 
     // --- CRUD Catégories / Tags ---
     Route::resource('tags', TagController::class);
@@ -125,3 +127,4 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
 // ------------------ AUTH ------------------
 require __DIR__ . '/auth.php';
+
