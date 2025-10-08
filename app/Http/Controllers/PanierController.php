@@ -2,37 +2,71 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Panier_item;
 use App\Models\Produit;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class PanierController extends Controller
 {
-    public function index(Request $request)
+    /**
+     * Affiche le contenu du panier
+     */
+    public function index()
     {
-        $items = $request->user()
-                         ->panierItems()
-                         ->with('produit')
-                         ->get();
+        $panier = session()->get('panier', []);
+        $total = collect($panier)->sum(fn($item) => $item['prix'] * $item['quantite']);
 
-        return inertia('Panier/Index', ['items' => $items]);
+        return Inertia::render('Panier/Index', [
+            'panier' => $panier,
+            'total' => $total,
+        ]);
     }
 
+    /**
+     * Ajoute un produit au panier
+     */
     public function add(Request $request, Produit $produit)
     {
-        $request->user()->panierItems()->updateOrCreate(
-            ['produit_id' => $produit->id],
-            ['quantite' => \DB::raw('quantite + 1')]
-        );
+        $panier = session()->get('panier', []);
 
-        return back()->with('success', 'Produit ajouté au panier');
+        if (isset($panier[$produit->id])) {
+            $panier[$produit->id]['quantite']++;
+        } else {
+            $panier[$produit->id] = [
+                'id' => $produit->id,
+                'nom' => $produit->nom,
+                'prix' => $produit->prix,
+                'image' => $produit->image_path ?? null,
+                'quantite' => 1,
+            ];
+        }
+
+        session()->put('panier', $panier);
+
+        return back()->with('success', 'Produit ajouté au panier.');
     }
 
-    // public function remove(Panier_item $item)
-    // {
-    //     $this->authorize('delete', $item); // facultatif si policy
-    //     $item->delete();
+    /**
+     * Supprime un produit du panier
+     */
+    public function remove(Produit $produit)
+    {
+        $panier = session()->get('panier', []);
 
-    //     return back()->with('success', 'Produit retiré du panier');
-    // }
+        if (isset($panier[$produit->id])) {
+            unset($panier[$produit->id]);
+            session()->put('panier', $panier);
+        }
+
+        return back()->with('success', 'Produit retiré du panier.');
+    }
+
+    /**
+     * Vide entièrement le panier
+     */
+    public function clear()
+    {
+        session()->forget('panier');
+        return back()->with('success', 'Panier vidé.');
+    }
 }

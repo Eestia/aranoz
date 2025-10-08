@@ -54,8 +54,8 @@ class BlogController extends Controller
 
     public function show($id)
     {
-        $blog = Blog::with(['categorie', 'tags'])->findOrFail($id);
-        return inertia('Admin/Blogs/Show', ['blog' => $blog]);
+        $blog = Blog::with('categorie', 'tags')->findOrFail($id);
+        return inertia('Blog/show', ['blog' => $blog]);
     }
 
     /* =======================

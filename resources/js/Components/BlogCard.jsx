@@ -45,7 +45,7 @@ export default function BlogCard({ blog }) {
 
         {/* Bouton "Lire plus" */}
         <div className="mt-3">
-          <Link href={`/blogs/${blog.id}`} className="btn btn-outline-dark btn-sm">
+          <Link href={route('public.blogs.show', blog.id)} className="btn btn-outline-dark btn-sm">
             Lire plus →
           </Link>
         </div>

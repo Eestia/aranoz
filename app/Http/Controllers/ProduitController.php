@@ -35,17 +35,26 @@ class ProduitController extends Controller
      * 🔹 SHOW
      * ======================= */
     public function show(Produit $produit)
-    {
-        if (request()->routeIs('admin.*')) {
-            return inertia('Admin/Products/Show', [
-                'produit' => $produit,
-            ]);
-        }
-
-        return inertia('produits/show', [
+{
+    // Si c’est l’admin
+    if (request()->routeIs('admin.*')) {
+        return inertia('Admin/Products/Show', [
             'produit' => $produit,
         ]);
     }
+
+    // Si l’utilisateur est connecté
+    if (auth()->check()) {
+        return inertia('User/Products/Show', [
+            'produit' => $produit,
+        ]);
+    }
+
+    // Sinon, visiteur public
+    return inertia('produits/show', [
+        'produit' => $produit,
+    ]);
+}
 
 
     /* =======================
