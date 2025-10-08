@@ -90,10 +90,17 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Page d’accueil admin
     Route::get('/home', fn() => Inertia::render('Admin/Home'))->name('home');
 
+     // produit image 
+    Route::post('products/{produit}/upload-image', [ProduitController::class, 'uploadImage'])
+    ->name('products.upload-image');
+
     // --- CRUD Admin généraux ---
     Route::resource('users', UserController::class);
     Route::resource('orders', CommandeController::class);
-    Route::resource('products', ProduitController::class);
+    Route::resource('products', ProduitController::class)->parameters([
+    'products' => 'produit'
+]);
+
     Route::resource('mailbox', MailboxController::class);
 
     // --- CRUD Blogs Admin ---

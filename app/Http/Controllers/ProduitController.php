@@ -36,12 +36,17 @@ class ProduitController extends Controller
      * ======================= */
     public function show(Produit $produit)
     {
-        $this->authorize('view', $produit);
+        if (request()->routeIs('admin.*')) {
+            return inertia('Admin/Products/Show', [
+                'produit' => $produit,
+            ]);
+        }
 
-        return Inertia::render('Admin/Products/Show', [
-            'produit' => $produit->load(['categorie', 'couleur']),
+        return inertia('produits/show', [
+            'produit' => $produit,
         ]);
     }
+
 
     /* =======================
      * 🔹 CREATE
@@ -105,57 +110,68 @@ class ProduitController extends Controller
      * 🔹 UPDATE
      * ======================= */
     public function update(Request $request, Produit $produit)
-    {
-        $validated = $request->validate([
-            'titre' => 'required|string|max:255',
-            'description' => 'required|string',
-            'prix' => 'required|integer|min:0',
-            'stock' => 'required|integer|min:0',
-            'couleur_id' => 'required|exists:couleurs,id',
-            'categorie_id' => 'required|exists:categories,id',
-            'en_reduction' => 'nullable|boolean',
-            'reduction_pct' => 'nullable|integer|min:0|max:100',
-            'is_pinned' => 'boolean',
-            'image' => 'nullable|image|max:2048',
-            'image2' => 'nullable|image|max:2048',
-            'image3' => 'nullable|image|max:2048',
-        ]);
+{
+    // ✅ Validation des champs
+    $validated = $request->validate([
+        'titre' => 'required|string|max:255',
+        'description' => 'required|string',
+        'prix' => 'required|numeric|min:0',
+        'stock' => 'required|integer|min:0',
+        'categorie_id' => 'required|exists:categories,id',
+        'couleur_id' => 'required|exists:couleurs,id',
+        'en_reduction' => 'nullable|boolean',
+        'reduction_pct' => 'nullable|numeric|min:0|max:100',
+        'is_pinned' => 'nullable|boolean',
+        'image' => 'nullable|image|max:2048',
+        'image2' => 'nullable|image|max:2048',
+        'image3' => 'nullable|image|max:2048',
+    ]);
 
-        // 🧠 Regénération du slug si le titre change
-        if ($produit->titre !== $validated['titre']) {
-            $validated['slug'] = Str::slug($validated['titre']);
-        }
-
-        // 📸 Gestion des images
-        foreach (['image', 'image2', 'image3'] as $img) {
-            $pathKey = "{$img}_path";
-            if ($request->hasFile($img)) {
-                if ($produit->$pathKey && file_exists(public_path("storage/{$produit->$pathKey}"))) {
-                    unlink(public_path("storage/{$produit->$pathKey}"));
-                }
-                $validated[$pathKey] = $request->file($img)->store('produits', 'public');
-            }
-        }
-
-        $produit->update($validated);
-
-        return redirect()->route('admin.products.index')->with('success', 'Produit mis à jour avec succès.');
+    // 🧠 Regénère le slug seulement si le titre change
+    if ($produit->titre !== $validated['titre']) {
+        $validated['slug'] = Str::slug($validated['titre']);
     }
+
+    // 📸 Gestion des images
+    foreach (['image', 'image2', 'image3'] as $img) {
+        if ($request->hasFile($img)) {
+            // Supprime l'ancienne si elle existe
+            $oldPath = $produit->{$img . '_path'};
+            if ($oldPath && file_exists(public_path('storage/' . $oldPath))) {
+                @unlink(public_path('storage/' . $oldPath));
+            }
+
+            // Sauvegarde la nouvelle image
+            $path = $request->file($img)->store('produits', 'public');
+            $validated[$img . '_path'] = $path;
+        }
+    }
+
+    // On retire les clés inutiles avant update()
+    unset($validated['image'], $validated['image2'], $validated['image3']);
+
+    // 🧾 Mise à jour du produit
+    $produit->update($validated);
+
+    return redirect()
+        ->route('admin.products.index')
+        ->with('success', '✅ Produit mis à jour avec succès.');
+}
+
+
 
     /* =======================
      * 🔹 DESTROY
      * ======================= */
     public function destroy(Produit $produit)
     {
-        foreach (['image_path', 'image2_path', 'image3_path'] as $imgPath) {
-            if ($produit->$imgPath && file_exists(public_path("storage/{$produit->$imgPath}"))) {
-                unlink(public_path("storage/{$produit->$imgPath}"));
-            }
-        }
+        $this->authorize('delete', $produit);
 
         $produit->delete();
 
-        return redirect()->route('admin.products.index')->with('success', 'Produit supprimé avec succès.');
+        return redirect()
+            ->route('admin.products.index')
+            ->with('success', 'Produit supprimé avec succès.');
     }
 
     /* =======================
@@ -177,5 +193,28 @@ class ProduitController extends Controller
     {
         $produits = Produit::orderBy('stock', 'asc')->take(20)->get();
         return response()->json($produits);
+    }
+
+    public function uploadImage(Request $request, Produit $produit)
+    {
+        $request->validate([
+            'image' => 'required|image|max:2048',
+        ]);
+
+        // Supprime l'ancienne image si nécessaire
+        if ($produit->image_path && file_exists(public_path('storage/' . $produit->image_path))) {
+            unlink(public_path('storage/' . $produit->image_path));
+        }
+
+        // Stocke la nouvelle
+        $path = $request->file('image')->store('produits', 'public');
+
+        // Met à jour la colonne correspondante
+        $produit->update(['image_path' => $path]);
+
+        return response()->json([
+            'message' => 'Image mise à jour avec succès',
+            'path' => $path,
+        ]);
     }
 }

@@ -1,9 +1,25 @@
 import { usePage, Link } from "@inertiajs/react";
+import { router } from "@inertiajs/react";
 import BreadcrumbAdmin from "@/Components/BreadcrumbAdmin";
 import Back from "../../../Layouts/Back";
 
 export default function Index() {
   const { produits = [] } = usePage().props;
+
+  const handleDelete = (slug) => {
+  if (confirm("Voulez-vous vraiment supprimer ce produit ?")) {
+    router.delete(route("admin.products.destroy", slug), {
+      preserveScroll: true,
+      onSuccess: () => {
+        console.log("Produit supprimé");
+      },
+      onError: (errors) => {
+        console.error("Erreur suppression :", errors);
+      },
+    });
+  }
+};
+
 
   return (
     <Back>
@@ -69,38 +85,27 @@ export default function Index() {
                       </td>
                       <td>
                         <Link
-                          href={route("admin.products.show", produit.id)}
-                          className="btn btn-outline-secondary btn-sm"
-                        >
-                          Voir
-                        </Link>
+                        href={route("admin.products.show", { produit: produit.slug })}
+                        className="btn btn-outline-secondary btn-sm"
+                      >
+                        Voir
+                      </Link>
                       </td>
                       <td>
                         <Link
-                          href={route("admin.products.edit", produit.id)}
+                          href={route("admin.products.edit", produit.slug)}
                           className="btn btn-info btn-sm text-white"
                         >
                           Modifier
                         </Link>
                       </td>
                       <td>
-                        <Link
-                          as="button"
-                          method="delete"
-                          href={route("admin.products.destroy", produit.id)}
+                        <button
+                          onClick={() => handleDelete(produit.slug)}
                           className="btn btn-danger btn-sm"
-                          onClick={(e) => {
-                            if (
-                              !confirm(
-                                "Voulez-vous vraiment supprimer ce produit ?"
-                              )
-                            ) {
-                              e.preventDefault();
-                            }
-                          }}
                         >
                           Supprimer
-                        </Link>
+                        </button>
                       </td>
                     </tr>
                   ))

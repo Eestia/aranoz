@@ -29,6 +29,7 @@
         "react-bootstrap-icons": "^1.11.6",
         "react-slick": "^0.31.0",
         "slick-carousel": "^1.8.1",
-        "sweetalert2": "^11.24.0"
+        "sweetalert2": "^11.24.0",
+        "ziggy-js": "^2.6.0"
     }
 }

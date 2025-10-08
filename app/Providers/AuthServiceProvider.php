@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\Gate;
 // policies
 use App\Models\Tag;
 use App\Policies\TagPolicy;
-
+use App\Models\Produit;
+use App\Policies\ProduitPolicy;
 class AuthServiceProvider extends ServiceProvider
 {
     protected $policies = [
@@ -16,7 +17,7 @@ class AuthServiceProvider extends ServiceProvider
     Tag::class => TagPolicy::class,
     \App\Models\CategorieBlog::class => \App\Policies\CategorieBlogPolicy::class,
     \App\Models\Adresse::class => \App\Policies\AdressePolicy::class,
-    \App\Models\Produit::class => \App\Policies\ProduitPolicy::class,
+    Produit::class => ProduitPolicy::class,
     ];
     public function register(): void
     {
