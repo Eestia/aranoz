@@ -2,19 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Produit;
 use Illuminate\Http\Request;
+use App\Models\Produit;
 use Inertia\Inertia;
 
 class PanierController extends Controller
 {
-    /**
-     * Affiche le contenu du panier
-     */
+    // ✅ Afficher le panier
     public function index()
     {
         $panier = session()->get('panier', []);
-        $total = collect($panier)->sum(fn($item) => $item['prix'] * $item['quantite']);
+        $total = array_sum(array_map(fn($item) => $item['prix'] * $item['quantite'], $panier));
 
         return Inertia::render('Panier/Index', [
             'panier' => $panier,
@@ -22,9 +20,7 @@ class PanierController extends Controller
         ]);
     }
 
-    /**
-     * Ajoute un produit au panier
-     */
+    // ✅ Ajouter un produit
     public function add(Request $request, Produit $produit)
     {
         $panier = session()->get('panier', []);
@@ -34,7 +30,7 @@ class PanierController extends Controller
         } else {
             $panier[$produit->id] = [
                 'id' => $produit->id,
-                'nom' => $produit->nom,
+                'nom' => $produit->titre,
                 'prix' => $produit->prix,
                 'image' => $produit->image_path ?? null,
                 'quantite' => 1,
@@ -43,12 +39,10 @@ class PanierController extends Controller
 
         session()->put('panier', $panier);
 
-        return back()->with('success', 'Produit ajouté au panier.');
+        return response()->json(['message' => '✅ Produit ajouté au panier']);
     }
 
-    /**
-     * Supprime un produit du panier
-     */
+    // 🗑️ Supprimer un produit
     public function remove(Produit $produit)
     {
         $panier = session()->get('panier', []);
@@ -61,9 +55,7 @@ class PanierController extends Controller
         return back()->with('success', 'Produit retiré du panier.');
     }
 
-    /**
-     * Vide entièrement le panier
-     */
+    // 🧹 Vider le panier
     public function clear()
     {
         session()->forget('panier');

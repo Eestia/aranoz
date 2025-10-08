@@ -20,3 +20,4 @@
         @inertia
     </body>
 </html>
+{{-- route('panier.add', 1) --}}

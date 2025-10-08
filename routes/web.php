@@ -20,7 +20,7 @@ use App\Models\{Categorie, CategorieBlog, Couleur, Produit, Tag};
 
 /*
 |--------------------------------------------------------------------------
-| Routes Web
+| Web Routes
 |--------------------------------------------------------------------------
 */
 
@@ -55,12 +55,14 @@ Route::resource('blogs', BlogController::class)
     ]);
 
 // ------------------ 🧺 PANIER ------------------
+// ✅ Version unique et propre
 Route::middleware('auth')->group(function () {
     Route::get('/panier', [PanierController::class, 'index'])->name('panier.index');
     Route::post('/panier/{produit}', [PanierController::class, 'add'])->name('panier.add');
     Route::delete('/panier/{produit}', [PanierController::class, 'remove'])->name('panier.remove');
-    Route::delete('/panier', [PanierController::class, 'clear'])->name('panier.clear');
+    Route::post('/panier/vider', [PanierController::class, 'clear'])->name('panier.clear');
 });
+
 
 // ------------------ 🧾 COMMANDES ------------------
 Route::middleware('auth')->group(function () {
