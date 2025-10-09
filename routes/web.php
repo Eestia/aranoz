@@ -14,7 +14,8 @@ use App\Http\Controllers\{
     ProduitController,
     ProfileController,
     TagController,
-    UserController
+    UserController,
+    CheckoutController,
 };
 use App\Models\{Categorie, CategorieBlog, Couleur, Produit, Tag};
 
@@ -24,7 +25,7 @@ use App\Models\{Categorie, CategorieBlog, Couleur, Produit, Tag};
 |--------------------------------------------------------------------------
 */
 
-// ------------------ 🌍 PARTIE PUBLIQUE ------------------
+// ------------------ 🌍 PAGE D’ACCUEIL ------------------
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // ------------------ 👤 PROFIL UTILISATEUR ------------------
@@ -39,14 +40,13 @@ Route::get('/user/home', fn() => Inertia::render('User/Home/Index'))
     ->middleware(['auth', 'verified'])
     ->name('user.home');
 
-// ✅ Alias pour compatibilité avec route('dashboard')
 Route::get('/dashboard', fn() => redirect()->route('user.home'))->name('dashboard');
 
-// ------------------ 🛍️ BOUTIQUE + BLOG ------------------
-Route::resource('adresses', AdresseController::class);
+// ------------------ 🛍️ PRODUITS + BLOG ------------------
 Route::resource('produits', ProduitController::class);
+Route::resource('adresses', AdresseController::class);
 
-// --- Blog public (index et show uniquement)
+// --- Blog public (index & show uniquement)
 Route::resource('blogs', BlogController::class)
     ->only(['index', 'show'])
     ->names([
@@ -54,8 +54,7 @@ Route::resource('blogs', BlogController::class)
         'show'  => 'public.blogs.show',
     ]);
 
-// ------------------ 🧺 PANIER ------------------
-// ✅ Version unique et propre
+// ------------------ 🛒 PANIER ------------------
 Route::middleware('auth')->group(function () {
     Route::get('/panier', [PanierController::class, 'index'])->name('panier.index');
     Route::post('/panier/{produit}', [PanierController::class, 'add'])->name('panier.add');
@@ -63,20 +62,38 @@ Route::middleware('auth')->group(function () {
     Route::post('/panier/vider', [PanierController::class, 'clear'])->name('panier.clear');
 });
 
+// ------------------ 💳 CHECKOUT ------------------
+Route::middleware('auth')->group(function () {
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+});
+// 🧾 Voir le suivi d'une commande
+Route::get('/commandes/{id}/track', [CommandeController::class, 'track'])
+    ->name('commandes.track')
+    ->middleware('auth');
 
+// 💳 Créer une commande
+Route::post('/commandes', [CommandeController::class, 'store'])
+    ->name('commandes.store')
+    ->middleware('auth');
 // ------------------ 🧾 COMMANDES ------------------
 Route::middleware('auth')->group(function () {
-    Route::post('/commande', [CommandeController::class, 'store'])->name('commande.store');
-});
-
-Route::middleware(['auth', 'role:admin,agent'])->group(function () {
     Route::get('/commandes', [CommandeController::class, 'index'])->name('commandes.index');
-    Route::patch('/commandes/{commande}/status', [CommandeController::class, 'updateStatus'])->name('commandes.updateStatus');
-    Route::post('/commandes/{commande}/contact', [CommandeController::class, 'contactClient'])
-        ->middleware('role:agent')->name('commandes.contactClient');
+    Route::post('/commandes', [CommandeController::class, 'store'])->name('commandes.store');
+    Route::get('/commandes/{commande}', [CommandeController::class, 'show'])->name('commandes.show');
 });
 
-// ------------------ 🛒 SHOP / PRODUITS ------------------
+// ------------------ 🧠 COMMANDES (ADMIN / AGENT) ------------------
+Route::middleware(['auth', 'role:admin,agent'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/commandes', [CommandeController::class, 'index'])->name('commandes.index');
+        Route::patch('/commandes/{commande}/status', [CommandeController::class, 'updateStatus'])->name('commandes.updateStatus');
+        Route::post('/commandes/{commande}/contact', [CommandeController::class, 'contactClient'])
+            ->middleware('role:agent')->name('commandes.contactClient');
+    });
+
+// ------------------ 🏬 SHOP ------------------
 Route::get('/shop', function () {
     $produits = Produit::with(['categorie', 'couleur'])->get();
     $categories = Categorie::pluck('nom');
@@ -94,55 +111,60 @@ Route::get('/best-sellers', function () {
     return inertia('Home/home', ['produits' => $produits]);
 })->name('best-sellers');
 
+// ------------------ 📬 CONTACT ------------------
 Route::get('/contact', [AdresseController::class, 'contact'])->name('contact');
 
-// ------------------ 🛠️ PARTIE ADMIN ------------------
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+// ------------------ ⚙️ PARTIE ADMIN ------------------
+Route::middleware(['auth'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
 
-    // Tableau de bord admin
-    Route::get('/dashboard', fn() => Inertia::render('Admin/Home'))
-        ->middleware('verified')
-        ->name('dashboard');
+        // Tableau de bord admin
+        Route::get('/dashboard', fn() => Inertia::render('Admin/Home'))
+            ->middleware('verified')
+            ->name('dashboard');
 
-    // Alias /home (cohérence)
-    Route::get('/home', fn() => redirect()->route('admin.dashboard'))->name('home');
+        // Alias /home
+        Route::get('/home', fn() => redirect()->route('admin.dashboard'))->name('home');
 
-    // Upload image produit
-    Route::post('/products/{produit}/upload-image', [ProduitController::class, 'uploadImage'])
-        ->name('products.upload-image');
+        // Upload image produit
+        Route::post('/products/{produit}/upload-image', [ProduitController::class, 'uploadImage'])
+            ->name('products.upload-image');
 
-    // --- CRUD Admin ---
-    Route::resource('users', UserController::class);
-    Route::resource('orders', CommandeController::class);
-    Route::resource('products', ProduitController::class)->parameters(['products' => 'produit']);
-    Route::resource('mailbox', MailboxController::class);
+        // --- CRUDs Admin ---
+        Route::resource('users', UserController::class);
+        Route::resource('orders', CommandeController::class);
+        Route::resource('products', ProduitController::class)->parameters(['products' => 'produit']);
+        Route::resource('mailbox', MailboxController::class);
 
-    // --- BLOGS ADMIN ---
-    Route::get('/blogs', [BlogController::class, 'adminIndex'])->name('blogs.index');
-    Route::get('/blogs/create', [BlogController::class, 'create'])->name('blogs.create');
-    Route::post('/blogs', [BlogController::class, 'store'])->name('blogs.store');
-    Route::get('/blogs/{id}/edit', [BlogController::class, 'edit'])->name('blogs.edit');
-    Route::put('/blogs/{id}', [BlogController::class, 'update'])->name('blogs.update');
-    Route::delete('/blogs/{id}', [BlogController::class, 'destroy'])->name('blogs.destroy');
-    Route::get('/blogs/{id}', [BlogController::class, 'show'])->name('blogs.show');
+        // --- BLOGS ADMIN ---
+        Route::get('/blogs', [BlogController::class, 'adminIndex'])->name('blogs.index');
+        Route::get('/blogs/create', [BlogController::class, 'create'])->name('blogs.create');
+        Route::post('/blogs', [BlogController::class, 'store'])->name('blogs.store');
+        Route::get('/blogs/{id}/edit', [BlogController::class, 'edit'])->name('blogs.edit');
+        Route::put('/blogs/{id}', [BlogController::class, 'update'])->name('blogs.update');
+        Route::delete('/blogs/{id}', [BlogController::class, 'destroy'])->name('blogs.destroy');
+        Route::get('/blogs/{id}', [BlogController::class, 'show'])->name('blogs.show');
 
-    // --- CATÉGORIES / TAGS ---
-    Route::resource('tags', TagController::class);
-    Route::resource('categories', CategorieController::class);
-    Route::resource('blog-categories', CategorieBlogController::class);
+        // --- CATÉGORIES / TAGS ---
+        Route::resource('tags', TagController::class);
+        Route::resource('categories', CategorieController::class);
+        Route::resource('blog-categories', CategorieBlogController::class);
 
-    Route::get('/category', function () {
-        return Inertia::render('Admin/Category', [
-            'tags' => Tag::all(),
-            'blogCategories' => CategorieBlog::all(),
-            'productCategories' => Categorie::all(),
-        ]);
-    })->name('category');
+        // Vue centralisée de catégories / tags
+        Route::get('/category', function () {
+            return Inertia::render('Admin/Category', [
+                'tags' => Tag::all(),
+                'blogCategories' => CategorieBlog::all(),
+                'productCategories' => Categorie::all(),
+            ]);
+        })->name('category');
 
-    // Contact admin
-    Route::get('/contact', [AdresseController::class, 'edit'])->name('contact.edit');
-    Route::put('/contact/{admin}', [AdresseController::class, 'update'])->name('contact.update');
-});
+        // Contact admin
+        Route::get('/contact', [AdresseController::class, 'edit'])->name('contact.edit');
+        Route::put('/contact/{admin}', [AdresseController::class, 'update'])->name('contact.update');
+    });
 
-// ------------------ AUTH ------------------
+// ------------------ 🔐 AUTH ------------------
 require __DIR__ . '/auth.php';

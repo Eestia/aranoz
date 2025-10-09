@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Commande;
+use App\Models\Panier_item;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Mail\CommandeEnvoyee;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class CommandeController extends Controller
 {
@@ -22,14 +25,12 @@ class CommandeController extends Controller
         $this->middleware('role:admin,agent')->only(['index', 'updateStatus', 'contactClient']);
     }
 
-    // ---------- 🧾 Liste des commandes (admin / agent)
+    // ---------- 🧾 Liste des commandes (admin / agent ou utilisateur)
     public function index()
     {
-        // Si admin ou agent -> voir toutes les commandes
         if (auth()->user()->hasRole(['admin', 'agent'])) {
             $commandes = Commande::with('user', 'commandeItems.produit')->latest()->get();
         } else {
-            // Sinon, afficher uniquement les commandes du user connecté
             $commandes = auth()->user()->commandes()->with('commandeItems.produit')->latest()->get();
         }
 
@@ -38,37 +39,57 @@ class CommandeController extends Controller
         ]);
     }
 
-    // ---------- 💳 Création d’une commande (utilisateur)
-    public function store(Request $request)
-    {
-        $user = $request->user();
+    // ---------- 💳 Création d’une commande (depuis Checkout)
+   public function store(Request $request)
+{
+    $total = 0;
+    $panier = session()->get('panier', []);
+    foreach ($panier as $item) {
+        $total += $item['prix'] * $item['quantite'];
+    }
 
-        $panierItems = $user->panierItems()->with('produit')->get();
+    $commande = Commande::create([
+        'user_id' => auth()->id(),
+        'status' => 'en_attente',
+        'total' => $total,
+        'mode_paiement' => $request->mode_paiement ?? 'Check Payments',
+        'billing' => json_encode($request->billing),
+        'shipping' => json_encode($request->shipping ?? []),
+    ]);
 
-        if ($panierItems->isEmpty()) {
-            return redirect()->route('panier.index')->with('error', 'Votre panier est vide.');
-        }
-
-        $total = $panierItems->sum(fn($item) => $item->produit->prix * $item->quantite);
-
-        $commande = $user->commandes()->create([
-            'total' => $total,
-            'mode_paiement' => $request->input('mode_paiement', 'non_specifie'),
-            'status' => 'en_attente',
+    // Optionnel : sauvegarde des produits liés
+    foreach ($panier as $item) {
+        $commande->items()->create([
+            'produit_id' => $item['id'],
+            'quantite' => $item['quantite'],
+            'prix' => $item['prix'],
         ]);
+    }
 
-        foreach ($panierItems as $item) {
-            $commande->commandeItems()->create([
-                'produit_id' => $item->produit_id,
-                'quantite' => $item->quantite,
-                'prix' => $item->produit->prix,
-            ]);
-        }
+    // Vide le panier
+    session()->forget('panier');
 
-        // 🔁 Vider le panier après validation
-        $user->panierItems()->delete();
+    // ✅ Redirection Inertia vers la page de suivi
+    return redirect()->route('commandes.track', $commande->id)
+        ->with('success', 'Commande enregistrée avec succès !')
+        ->with('commande_id', $commande->id);
+}
 
-        return redirect()->route('commandes.index')->with('success', 'Commande validée avec succès !');
+
+
+
+
+
+    // ---------- 🚚 Détails d’une commande (Track your order)
+    public function show(Commande $commande)
+    {
+        $this->authorize('view', $commande);
+
+        $commande->load('commandeItems.produit', 'user');
+
+        return Inertia::render('Commandes/Show', [
+            'commande' => $commande,
+        ]);
     }
 
     // ---------- 🚚 Mise à jour du statut (admin / agent)
@@ -98,4 +119,13 @@ class CommandeController extends Controller
 
         return redirect()->back()->with('success', 'Mail envoyé au client.');
     }
+    public function track($id)
+    {
+        $commande = Commande::with('items.produit')->findOrFail($id);
+
+        return inertia('Commandes/Track', [
+            'commande' => $commande,
+        ]);
+    }
+
 }

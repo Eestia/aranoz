@@ -72,5 +72,8 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Role::class);
     }
-
+    public function panierItems()
+    {
+        return $this->hasMany(Panier_item::class);
+    }
 }
